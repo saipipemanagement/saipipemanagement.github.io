@@ -2213,10 +2213,10 @@
         </div>
         <form class="login-form" onsubmit="event.preventDefault(); App.Auth.login();">
           <div class="form-group">
-            <label class="form-label">Username</label>
+            <label class="form-label">Email / Username</label>
             <div class="input-wrapper">
               <i class="input-icon fa-solid fa-user"></i>
-              <input type="text" id="login-username" class="form-input" placeholder="Enter username" autocomplete="username" required>
+              <input type="text" id="login-username" class="form-input" placeholder="Enter email or username" autocomplete="username" required>
             </div>
           </div>
           <div class="form-group">
@@ -2665,6 +2665,7 @@
         </button>
       </div>
       <input type="hidden" id="eng-edit-id">
+      <input type="hidden" id="eng-userId">
       <div class="form-grid">
         <div class="form-group">
           <label class="form-label">Full Name *</label>
@@ -2674,6 +2675,17 @@
           <label class="form-label">Employee ID *</label>
           <input type="text" class="form-control" id="eng-empId" required>
         </div>
+
+        <!-- NEW AUTHENTICATION FIELDS -->
+        <div class="form-group" id="eng-auth-email-group">
+          <label class="form-label">Login Email</label>
+          <input type="email" class="form-control" id="eng-email" placeholder="engineer@saipipe.com">
+        </div>
+        <div class="form-group" id="eng-auth-pass-group">
+          <label class="form-label">Login Password</label>
+          <input type="text" class="form-control" id="eng-password" placeholder="Min 6 characters">
+        </div>
+
         <div class="form-group">
           <label class="form-label">Phone</label>
           <input type="tel" class="form-control" id="eng-phone">
@@ -2911,7 +2923,8 @@
     getAuth, 
     signInWithEmailAndPassword, 
     signOut, 
-    onAuthStateChanged 
+    onAuthStateChanged,
+    createUserWithEmailAndPassword 
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import {
     getFirestore, 
@@ -2929,7 +2942,8 @@
     serverTimestamp, 
     Timestamp,
     writeBatch,
-    startAfter
+    startAfter,
+    setDoc
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   // ============================================
@@ -2949,8 +2963,12 @@
   const auth = getAuth(firebaseApp);
   const db = getFirestore(firebaseApp);
 
+  // SECONDARY APP: Used to create new Engineer accounts without logging the Admin out.
+  const secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
+  const secondaryAuth = getAuth(secondaryApp);
+
   // ============================================
-  // USERNAME TO EMAIL MAPPING
+  // USERNAME TO EMAIL MAPPING (LEGACY USERS)
   // ============================================
   const USERNAME_MAP = {
     "saiadmin": { email: "saiadmin@saipipemanagement.app", role: "admin", display: "Administrator" },
@@ -3262,9 +3280,11 @@
     hideLoading() {
       setTimeout(() => {
         const ls = document.getElementById('loading-screen');
-        ls.style.opacity = '0';
-        ls.style.transition = 'opacity 0.4s ease';
-        setTimeout(() => ls.style.display = 'none', 400);
+        if (ls) {
+          ls.style.opacity = '0';
+          ls.style.transition = 'opacity 0.4s ease';
+          setTimeout(() => ls.style.display = 'none', 400);
+        }
       }, 600);
     },
 
@@ -3337,31 +3357,28 @@
   // ============================================
   const Auth = {
     async login() {
-      const username = document.getElementById('login-username').value.trim();
+      const usernameOrEmail = document.getElementById('login-username').value.trim();
       const password = document.getElementById('login-password').value;
       const errorEl = document.getElementById('login-error');
       const btn = document.getElementById('login-btn');
 
       errorEl.classList.remove('show');
 
-      if (!username || !password) {
+      if (!usernameOrEmail || !password) {
         document.getElementById('login-error-msg').textContent = 'Please enter credentials.';
         errorEl.classList.add('show');
         return;
       }
 
-      const map = USERNAME_MAP[username.toLowerCase()];
-      if (!map) {
-        document.getElementById('login-error-msg').textContent = 'Invalid username.';
-        errorEl.classList.add('show');
-        return;
-      }
+      // Allow login via legacy username mapped to email, OR direct email
+      const map = USERNAME_MAP[usernameOrEmail.toLowerCase()];
+      const loginEmail = map ? map.email : usernameOrEmail;
 
       btn.disabled = true;
       btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px"></div> Signing in...';
 
       try {
-        await signInWithEmailAndPassword(auth, map.email, password);
+        await signInWithEmailAndPassword(auth, loginEmail, password);
       } catch (e) {
         document.getElementById('login-error-msg').textContent = 'Invalid credentials. Please try again.';
         errorEl.classList.add('show');
@@ -3411,6 +3428,7 @@
       App.navigateTo('dashboard');
     },
 
+    // Legacy function for old "saiuser" shared login flow.
     showEngSelect() {
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('app').style.display = 'none';
@@ -3547,7 +3565,7 @@
     }
   };
 
-// ============================================
+  // ============================================
   // DASHBOARD MODULE
   // ============================================
   const Dashboard = {
@@ -4291,6 +4309,7 @@
             <div style="margin-top:6px">
               <span class="badge ${eng.status === 'active' ? 'badge-success' : 'badge-muted'}">${eng.status || 'active'}</span>
             </div>
+            ${eng.email ? `<div style="font-size:12px;color:var(--text-tertiary);margin-top:4px"><i class="fa-solid fa-envelope" style="margin-right:5px"></i>${Utils.escapeHtml(eng.email)}</div>` : ''}
           </div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px">
@@ -4331,10 +4350,16 @@
     openAdd() {
       document.getElementById('eng-modal-title').textContent = 'Add Engineer';
       document.getElementById('eng-edit-id').value = '';
-      ['eng-name', 'eng-empId', 'eng-phone', 'eng-location', 'eng-notes'].forEach(id => {
+      document.getElementById('eng-userId').value = '';
+      ['eng-name', 'eng-empId', 'eng-phone', 'eng-location', 'eng-notes', 'eng-email', 'eng-password'].forEach(id => {
         document.getElementById(id).value = '';
       });
       document.getElementById('eng-status').value = 'active';
+      
+      // Show auth fields when adding new
+      document.getElementById('eng-auth-email-group').style.display = 'flex';
+      document.getElementById('eng-auth-pass-group').style.display = 'flex';
+      
       UI.openModal('modal-eng');
     },
 
@@ -4344,12 +4369,18 @@
       
       document.getElementById('eng-modal-title').textContent = 'Edit Engineer';
       document.getElementById('eng-edit-id').value = id;
+      document.getElementById('eng-userId').value = eng.userId || '';
       document.getElementById('eng-name').value = eng.name || '';
       document.getElementById('eng-empId').value = eng.empId || '';
       document.getElementById('eng-phone').value = eng.phone || '';
       document.getElementById('eng-location').value = eng.location || '';
       document.getElementById('eng-status').value = eng.status || 'active';
       document.getElementById('eng-notes').value = eng.notes || '';
+      
+      // Hide Auth fields when editing (password changes should be done via Firebase Console for now)
+      document.getElementById('eng-auth-email-group').style.display = 'none';
+      document.getElementById('eng-auth-pass-group').style.display = 'none';
+
       UI.openModal('modal-eng');
     },
 
@@ -4374,17 +4405,56 @@
 
       try {
         if (id) {
+          // EDITING EXISTING
+          // Preserve existing auth linkages
+          const existingEng = State.engineers.find(e => e.id === id);
+          if (existingEng) {
+            data.userId = existingEng.userId || null;
+            data.email = existingEng.email || null;
+          }
           await DataService.update('engineers', id, data);
           const idx = State.engineers.findIndex(e => e.id === id);
           if (idx >= 0) State.engineers[idx] = { ...State.engineers[idx], ...data };
+          UI.toast('Success', 'Engineer updated.', 'success');
         } else {
+          // CREATING NEW
+          const email = document.getElementById('eng-email').value.trim();
+          const password = document.getElementById('eng-password').value;
+
+          if (email && password) {
+            if (password.length < 6) {
+              UI.toast('Validation', 'Password must be at least 6 characters.', 'warning');
+              return;
+            }
+            
+            // 1. Create User in Secondary Auth
+            const userCred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+            const newUserId = userCred.user.uid;
+            await signOut(secondaryAuth); // Sign out of the secondary instance
+
+            // 2. Add Role mapping to `users` collection using Primary DB
+            await setDoc(doc(db, 'users', newUserId), {
+              email: email,
+              role: 'engineer',
+              displayName: name,
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp()
+            });
+
+            // 3. Attach userId and email to Engineer data
+            data.userId = newUserId;
+            data.email = email;
+          }
+
+          // 4. Create Engineer profile
           const docRef = await DataService.add('engineers', data);
           State.engineers.push({ id: docRef.id, ...data });
+          
+          UI.toast('Success', 'Engineer created successfully.', 'success');
         }
         
         UI.closeModal('modal-eng');
         this.renderGrid(State.engineers);
-        UI.toast('Success', id ? 'Engineer updated.' : 'Engineer added.', 'success');
       } catch (e) {
         UI.toast('Error', e.message, 'error');
       }
@@ -5460,29 +5530,62 @@
         }
 
         try {
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
-          if (!userDoc.exists()) {
+          let role = null;
+          let isLegacyEng = false;
+
+          // 1. Check if it's a legacy hardcoded user mapping
+          const mapEntry = Object.values(USERNAME_MAP).find(m => m.email === user.email);
+          if (mapEntry) {
+            role = mapEntry.role;
+            if (mapEntry.email === USERNAME_MAP['saiuser'].email) {
+              isLegacyEng = true;
+            }
+          } else {
+            // 2. Check if it's a newly created individual user account
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+              role = userDoc.data().role;
+            }
+          }
+
+          if (!role) {
             await signOut(auth);
+            UI.toast('Error', 'Account role not found.', 'error');
             Auth.showLogin();
             return;
           }
 
-          const data = userDoc.data();
           State.currentUser = user;
-          State.currentRole = data.role;
+          State.currentRole = role;
 
           // Load initial data
           await DataService.loadInitialData();
 
-          if (State.currentRole === 'engineer') {
-            const engId = sessionStorage.getItem('selectedEngineerId');
-            if (!engId) {
-              Auth.showEngSelect();
+          if (role === 'engineer') {
+            if (isLegacyEng) {
+               // Legacy shared login flow
+               const engId = sessionStorage.getItem('selectedEngineerId');
+               if (!engId) {
+                 Auth.showEngSelect();
+               } else {
+                 State.currentEngineer = State.engineers.find(e => e.id === engId) || null;
+                 Auth.showApp();
+               }
             } else {
-              State.currentEngineer = State.engineers.find(e => e.id === engId) || null;
-              Auth.showApp();
+               // New individual login flow
+               const engQuery = query(collection(db, 'engineers'), where('userId', '==', user.uid));
+               const engSnap = await getDocs(engQuery);
+
+               if (!engSnap.empty) {
+                 State.currentEngineer = { id: engSnap.docs[0].id, ...engSnap.docs[0].data() };
+                 Auth.showApp();
+               } else {
+                 UI.toast('Error', 'Engineer profile linked to this account not found.', 'error');
+                 await Auth.logout();
+               }
             }
           } else {
+            // Admin or Viewer
             Auth.showApp();
           }
         } catch (e) {
