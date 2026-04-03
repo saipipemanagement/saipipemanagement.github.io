@@ -1,0 +1,223 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Get user's role from users collection
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    // Check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'admin';
+    }
+    
+    // Check if user is engineer
+    function isEngineer() {
+      return isAuthenticated() && getUserRole() == 'engineer';
+    }
+    
+    // Check if user is viewer
+    function isViewer() {
+      return isAuthenticated() && getUserRole() == 'viewer';
+    }
+    
+    // Check if user owns the engineer record (for engineers)
+    function ownsEngineerRecord(engineerId) {
+      return isEngineer() && 
+        exists(/databases/$(database)/documents/engineers/$(engineerId)) &&
+        get(/databases/$(database)/documents/engineers/$(engineerId)).data.userId == request.auth.uid;
+    }
+    
+    // Validate timestamp fields
+    function hasValidTimestamps() {
+      return request.resource.data.updatedAt == request.time &&
+        (resource == null || request.resource.data.createdAt == resource.data.createdAt);
+    }
+    
+    // ============================================
+    // USERS COLLECTION
+    // ============================================
+    match /users/{userId} {
+      // Allow read if authenticated and reading own doc or is admin
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      
+      // Only admin can create/update/delete users
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================
+    // ENGINEERS COLLECTION
+    // ============================================
+    match /engineers/{engineerId} {
+      // All authenticated users can read engineers
+      allow read: if isAuthenticated();
+      
+      // Only admin can create/update/delete
+      allow create: if isAdmin() && 
+        request.resource.data.keys().hasAll(['name', 'empId']) &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0 &&
+        request.resource.data.empId is string &&
+        request.resource.data.empId.size() > 0;
+      
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================
+    // INVENTORY COLLECTION
+    // ============================================
+    match /inventory/{itemId} {
+      // All authenticated users can read inventory
+      allow read: if isAuthenticated();
+      
+      // Only admin can create/update/delete
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasAll(['pipeType', 'diameter', 'quantity']) &&
+        request.resource.data.pipeType is string &&
+        request.resource.data.pipeType.size() > 0 &&
+        request.resource.data.diameter is string &&
+        request.resource.data.diameter.size() > 0 &&
+        request.resource.data.quantity is number &&
+        request.resource.data.quantity >= 0;
+      
+      allow update: if isAdmin() &&
+        request.resource.data.quantity is number &&
+        request.resource.data.quantity >= 0;
+      
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================
+    // ASSIGNMENTS COLLECTION
+    // ============================================
+    match /assignments/{assignmentId} {
+      // All authenticated users can read assignments
+      allow read: if isAuthenticated();
+      
+      // Admin can create/update/delete any assignment
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasAll(['engineerId', 'pipeId', 'quantity']) &&
+        request.resource.data.engineerId is string &&
+        request.resource.data.pipeId is string &&
+        request.resource.data.quantity is number &&
+        request.resource.data.quantity > 0;
+      
+      allow update: if isAdmin() &&
+        request.resource.data.quantity is number &&
+        request.resource.data.quantity > 0;
+      
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================
+    // DPRS (DAILY PROGRESS REPORTS) COLLECTION
+    // ============================================
+    match /dprs/{dprId} {
+      // All authenticated users can read DPRs
+      allow read: if isAuthenticated();
+      
+      // Admin can create any DPR
+      // Engineers can only create DPRs for themselves
+      allow create: if isAuthenticated() &&
+        request.resource.data.keys().hasAll(['engineerId', 'assignmentId', 'date', 'pipesUsed', 'meterLaid']) &&
+        request.resource.data.engineerId is string &&
+        request.resource.data.assignmentId is string &&
+        request.resource.data.date is string &&
+        request.resource.data.pipesUsed is number &&
+        request.resource.data.pipesUsed >= 0 &&
+        request.resource.data.meterLaid is number &&
+        request.resource.data.meterLaid >= 0 &&
+        (isAdmin() || request.resource.data.engineerId == resource.data.engineerId);
+      
+      // Only admin can update/delete DPRs
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================
+    // TARGETS COLLECTION
+    // ============================================
+    match /targets/{targetId} {
+      // All authenticated users can read targets
+      allow read: if isAuthenticated();
+      
+      // Only admin can create/update/delete targets
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasAll(['engineerId', 'month', 'targetMeters', 'targetPipes']) &&
+        request.resource.data.engineerId is string &&
+        request.resource.data.month is string &&
+        request.resource.data.targetMeters is number &&
+        request.resource.data.targetMeters >= 0 &&
+        request.resource.data.targetPipes is number &&
+        request.resource.data.targetPipes >= 0;
+      
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================
+    // SETTINGS COLLECTION
+    // ============================================
+    match /settings/{settingId} {
+      // All authenticated users can read settings
+      allow read: if isAuthenticated();
+      
+      // Only admin can write settings
+      allow write: if isAdmin();
+    }
+    
+    // ============================================
+    // NOTIFICATIONS COLLECTION (Optional)
+    // ============================================
+    match /notifications/{notificationId} {
+      // Users can only read their own notifications
+      allow read: if isAuthenticated() && 
+        resource.data.userId == request.auth.uid;
+      
+      // Only admin/system can create notifications
+      allow create: if isAdmin();
+      
+      // Users can only update their own notifications (e.g., mark as read)
+      allow update: if isAuthenticated() && 
+        resource.data.userId == request.auth.uid;
+      
+      // Only admin can delete notifications
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================
+    // AUDIT LOGS COLLECTION (Optional)
+    // ============================================
+    match /auditLogs/{logId} {
+      // Only admin can read audit logs
+      allow read: if isAdmin();
+      
+      // System can create audit logs (via Cloud Functions)
+      allow create: if isAdmin();
+      
+      // No updates or deletes allowed
+      allow update: if false;
+      allow delete: if false;
+    }
+    
+    // ============================================
+    // DENY ALL OTHER ACCESS BY DEFAULT
+    // ============================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
