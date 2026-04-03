@@ -1,338 +1,230 @@
-# Sai Eternal Foundation - Pipe Data Management System
+<div align="center">
+  <h1>Sai Eternal Foundation - Pipe Data Management System</h1>
+  <p>A production-ready, mobile-first Firebase web application for managing pipe inventory, engineer assignments, daily progress reports (DPR), and performance targets.</p>
 
-A production-ready, mobile-first Firebase web application for managing pipe inventory, engineer assignments, daily progress reports (DPR), and performance targets.
+  <p>
+    <img src="https://img.shields.io/badge/version-2.1.0-blue.svg?cacheSeconds=2592000" alt="Version" />
+    <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white" alt="HTML5" />
+    <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white" alt="CSS3" />
+    <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black" alt="JavaScript" />
+    <img src="https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=black" alt="Firebase" />
+    <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" />
+  </p>
+</div>
 
 ---
 
-## Features
+## 🌟 Key Features
 
 ### Core Modules
-- **Dashboard** - Role-based overview with stats and charts
-- **Inventory** - Pipe stock management with low stock alerts
-- **Engineers** - Engineer profiles and performance tracking
-- **Assignments** - Pipe assignment to engineers with usage tracking
-- **DPR** - Daily Progress Report submission and viewing
-- **Targets** - Monthly performance targets with progress tracking
-- **Reports** - Analytics and exportable reports
-- **Notifications** - Low stock and activity alerts
+- 📊 **Dashboard** - Role-based overview with real-time stats and interactive charts.
+- 📦 **Inventory** - Comprehensive pipe stock management with automated low stock alerts.
+- 👷 **Engineers** - Secure engineer profile management with individual, secure login generation.
+- 📋 **Assignments** - Track pipe assignments to field engineers with dynamic usage tracking.
+- 📝 **DPR (Daily Progress Report)** - Streamlined field activity logging and pipe usage records.
+- 🎯 **Targets** - Set and monitor monthly performance targets per engineer.
+- 📈 **Reports** - Detailed analytics and one-click CSV exportable reports.
+- 🔔 **Notifications** - Real-time alerts for low inventory and recent field activity.
 
-### User Roles
-| Role | Permissions |
-|------|-------------|
-| **Admin** | Full access - create, read, update, delete all data |
-| **Engineer** | View inventory, submit DPRs, view own assignments/targets |
-| **Viewer** | Read-only access to all data |
-
-### Mobile-First Design
-- Responsive layout for all screen sizes
-- Touch-friendly interface
-- Bottom navigation for mobile
-- Card-based table views on small screens
-- Optimized for Android and iOS browsers
+### 📱 Mobile-First Design
+- Fully responsive layout adapting perfectly to all screen sizes.
+- Touch-friendly interface with optimized tap targets.
+- Persistent bottom navigation bar for mobile users.
+- Card-based data views on small screens replacing traditional tables.
+- Optimized for Chrome (Android) and Safari (iOS).
 
 ---
 
-## Technical Stack
+## 🔐 Authentication & Roles
 
-- **Frontend:** Vanilla JavaScript, CSS3, HTML5
-- **Backend:** Firebase (Auth, Firestore)
-- **Charts:** Chart.js 4.4.0
-- **Icons:** Font Awesome 6.5.0
-- **Fonts:** Inter, JetBrains Mono
+The system employs a secure, role-based access control (RBAC) mechanism. As of v2.1.0, engineers are provisioned with individual, secure login credentials.
+
+### Default Credentials
+
+| Role | Username / ID | Password | Access Level |
+| :--- | :--- | :--- | :--- |
+| **👑 Admin** | `saiadmin` | `SaiAdmin@12` | Full Control. Create/Manage users, view all data, set targets. |
+| **👁️ Viewer** | `viewer` | `Sai@viewer` | Read-only. Access to view dashboards, reports, and overall data. |
+| **👷 Master Engineer** | `saiuser` | `user@saiEF` | *(Legacy Shared Account)* Shared login that prompts for profile selection. |
+
+> **Note:** For new engineers, the Admin will create an individual profile and assign a specific Email and Password during creation. Engineers can then log in securely using those exact credentials, bypassing the legacy profile selection screen.
 
 ---
 
-## Architecture
+## 🛠️ Technical Stack
+
+- **Frontend:** Vanilla JavaScript (ES6+), CSS3 (Custom Properties), HTML5
+- **Backend & Database:** Google Firebase (Authentication, Firestore Database)
+- **Data Visualization:** Chart.js 4.4.0
+- **Iconography:** Font Awesome 6.5.0
+- **Typography:** Inter (Sans), JetBrains Mono (Monospace)
+
+---
+
+## 🏗️ System Architecture
 
 ### Modular Structure
-```
+
+```text
 App/
-├── Auth/           # Authentication module
-├── UI/             # UI utilities and components
-├── DataService/    # Firebase data operations
-├── Dashboard/      # Dashboard page logic
-├── Inventory/      # Inventory management
-├── Engineers/      # Engineer management
-├── Assignments/    # Assignment management
-├── DPR/            # DPR submission and viewing
-├── Targets/        # Target management
-├── Reports/        # Reporting and analytics
-└── Notifications/  # Notification system
+├── Auth/           # Authentication & session management (Individual & Legacy mapping)
+├── UI/             # DOM manipulation, theme handling, and modals
+├── DataService/    # Optimized Firestore CRUD operations & caching
+├── Dashboard/      # Top-level metrics and recent activity feeds
+├── Inventory/      # Stock tracking and variance calculation
+├── Engineers/      # Profile management and secure Auth provisioning
+├── Assignments/    # Logistics and pipe dispatching
+├── DPR/            # Field reporting and data validation
+├── Targets/        # Performance goals and metric tracking
+├── Reports/        # Data aggregation and CSV generation
+└── Notifications/  # In-app alert system for stock/activity
 ```
 
-### State Management
-- Centralized state object
-- In-memory caching for small collections
-- Optimistic updates for better UX
-
-### Firebase Free Tier Optimization
-- Limited queries with pagination
-- Debounced search/filter inputs
-- Local state updates after writes
-- No unnecessary real-time listeners
+### State Management & Performance
+- **Centralized State Object:** Single source of truth for UI rendering.
+- **Firebase Free Tier Optimization:** Aggressive in-memory caching minimizes read operations. Data is loaded selectively (e.g., last 100 records for the dashboard) with full loads only triggered for reporting/exports.
+- **Optimistic UI Updates:** Instant UI feedback before database confirmation for a snappy user experience.
+- **Debounced Inputs:** Search bars are debounced (150ms) to prevent rapid-fire database queries.
 
 ---
 
-## File Structure
+## 📁 Repository Structure
 
-```
+```text
 sai-pipe-management/
-├── index.html              # Main application file
-├── firestore.rules         # Firestore security rules
-├── firestore.indexes.json  # Firestore index configuration
-├── FIRESTORE_SCHEMA.md     # Database schema documentation
-├── SETUP_GUIDE.md          # Setup instructions
-└── README.md               # This file
+├── index.html              # Main application entry point (Single Page App)
+├── firestore.rules         # Firestore security & validation rules
+├── firestore.indexes.json  # Pre-configured composite index definitions
+├── FIRESTORE_SCHEMA.md     # Detailed database schema and relationships
+├── SETUP_GUIDE.md          # Step-by-step installation instructions
+└── README.md               # Project documentation (You are here)
 ```
 
 ---
 
-## Quick Start
+## 🚀 Quick Start Guide
 
-### 1. Firebase Setup
+### 1. Firebase CLI Setup
 ```bash
-# Install Firebase CLI
+# Install Firebase CLI globally
 npm install -g firebase-tools
 
-# Login
+# Login to your Google Account
 firebase login
 
-# Initialize
+# Initialize project within the directory
 firebase init
 ```
 
-### 2. Deploy Security Rules
+### 2. Deploy Security & Indexes
 ```bash
+# Deploy Firestore security rules
 firebase deploy --only firestore:rules
-```
 
-### 3. Deploy Indexes
-```bash
+# Deploy composite indexes (Required for complex sorting/filtering)
 firebase deploy --only firestore:indexes
 ```
 
-### 4. Deploy Hosting
+### 3. Deploy Application
 ```bash
+# Deploy the web app to Firebase Hosting
 firebase deploy --only hosting
 ```
 
-See [SETUP_GUIDE.md](SETUP_GUIDE.md) for detailed instructions.
+*For comprehensive setup details, including connecting your specific Firebase project, see `SETUP_GUIDE.md`.*
 
 ---
 
-## Firestore Collections
+## 🛡️ Security Architecture
 
-| Collection | Purpose | Fields |
-|------------|---------|--------|
-| `users` | Auth role mapping | email, role, displayName |
-| `engineers` | Engineer profiles | name, empId, phone, location, status |
-| `inventory` | Pipe stock | pipeType, diameter, material, quantity |
-| `assignments` | Pipe assignments | engineerId, pipeId, quantity, assignedUsed |
-| `dprs` | Daily reports | engineerId, assignmentId, date, pipesUsed, meterLaid |
-| `targets` | Monthly targets | engineerId, month, targetMeters, targetPipes |
-| `settings` | App configuration | key-value pairs |
-
-See [FIRESTORE_SCHEMA.md](FIRESTORE_SCHEMA.md) for complete schema.
-
----
-
-## Security
-
-### Authentication
-- Firebase Auth with email/password
-- Role-based access control
-- Session persistence
+### Authentication Upgrades (v2.1.0)
+- **Individual Engineer Accounts:** Admins now provision unique Email/Password combinations for every new engineer directly from the UI.
+- **Secondary Auth Instance:** The system uses a secondary Firebase app instance during user creation, ensuring the Admin remains securely logged in while provisioning new accounts.
+- **Smart Login Fallback:** The login screen intuitively handles both new secure email logins and legacy username mappings.
 
 ### Firestore Rules
-- Read/write permissions based on role
-- Data validation on create/update
-- No client-side security bypass
-
-### Best Practices
-- Strong passwords required
-- 2FA recommended for admin accounts
-- Regular security rule reviews
+- Strict read/write permissions mapped to the authenticated user's assigned role.
+- Server-side data validation ensures data integrity regardless of the client.
+- Complete prevention of client-side security bypasses.
 
 ---
 
-## Performance
+## 🌐 Browser Compatibility
 
-### Optimizations
-- Debounced search (150ms)
-- Limited queries (100 records default)
-- In-memory caching
-- Chart instance reuse
-- Mobile-optimized CSS
-
-### Bundle Size
-- No build step required
-- CDN-loaded dependencies
-- ~50KB gzipped application code
+| Browser | Minimum Version | Note |
+| :--- | :--- | :--- |
+| **Google Chrome** | 90+ | Recommended |
+| **Mozilla Firefox** | 88+ | Fully Supported |
+| **Apple Safari** | 14+ | Fully Supported |
+| **Microsoft Edge** | 90+ | Fully Supported |
+| **Chrome (Android)** | 90+ | Mobile Optimized |
+| **Safari (iOS)** | 14+ | Mobile Optimized |
 
 ---
 
-## Browser Support
+## 📊 Firebase Limits & Usage (Free Tier)
 
-| Browser | Version |
-|---------|---------|
-| Chrome | 90+ |
-| Firefox | 88+ |
-| Safari | 14+ |
-| Edge | 90+ |
-| Chrome Android | 90+ |
-| Safari iOS | 14+ |
+This application is highly optimized to comfortably run on Firebase's "Spark" (Free) tier for small to medium operations.
 
----
-
-## Firebase Free Tier Limits
-
-| Resource | Limit | Typical Usage |
-|----------|-------|---------------|
-| Reads | 50,000/day | ~2,000/day |
-| Writes | 20,000/day | ~500/day |
-| Deletes | 20,000/day | ~100/day |
-| Storage | 1 GB | ~100 MB |
-| Hosting | 10 GB/month | ~1 GB/month |
-
-**Note:** Moderate usage (20 users, 200 DPRs/month) stays well within free tier.
+| Resource | Free Tier Limit | Typical App Usage (Estimated) |
+| :--- | :--- | :--- |
+| **Document Reads** | 50,000 / day | ~2,000 / day |
+| **Document Writes** | 20,000 / day | ~500 / day |
+| **Document Deletes** | 20,000 / day | ~100 / day |
+| **Storage** | 1 GB | ~10 MB (Data only, no media) |
+| **Hosting** | 10 GB / month | ~1 GB / month |
 
 ---
 
-## Customization
+## 🎨 Customization
 
 ### Theme Colors
-Edit CSS variables in `index.html`:
+Easily rebrand the application by modifying the CSS variables located at the top of the `<style>` block in `index.html`:
+
 ```css
 :root {
-  --primary-500: #14b8a6;  /* Main brand color */
-  --accent-500: #f59e0b;   /* Accent color */
-  --danger-500: #ef4444;   /* Error color */
+  --primary-500: #14b8a6;  /* Primary Brand Color (Teal) */
+  --accent-500: #f59e0b;   /* Accent Color (Amber) */
+  --danger-500: #ef4444;   /* Error/Critical Color (Red) */
   /* ... */
 }
 ```
 
-### Logo/Branding
-Replace the water icon with your logo:
-```html
-<div class="login-logo">
-  <img src="your-logo.png" alt="Logo">
-</div>
-```
-
-### Custom Fields
-Add custom fields to DPR form in the `DPR` module.
+### Logo Replacement
+To replace the default Font Awesome water icon (`fa-water`), search for the `.login-logo` or `.sidebar-logo` classes in `index.html` and replace the inner `<i>` tag with an `<img>` tag pointing to your logo.
 
 ---
 
-## Troubleshooting
+## 📝 Changelog
 
-### Common Issues
+### v2.1.0 (Current)
+- 🔒 **Security Major Upgrade:** Implemented individual, secure credential generation for Engineers.
+- ⚙️ **Dual Auth System:** Added secondary Firebase initialization to allow Admins to create users seamlessly.
+- 🚀 **Smart Routing:** Individual engineers bypass the legacy "Select Profile" screen completely.
 
-**Permission Denied**
-- Check Firestore rules are deployed
-- Verify user exists in `users` collection
+### v2.0.0
+- 📱 Complete mobile-first UI/UX redesign.
+- 🧩 Transitioned to a modular JavaScript architecture within a Single Page App.
+- ⚡ Aggressive Firebase read optimizations (caching & limits).
+- 🌓 Implemented Dark/Light mode toggle.
+- 📱 Introduced persistent mobile bottom navigation and card-based data views.
 
-**Index Errors**
-- Deploy indexes: `firebase deploy --only firestore:indexes`
-- Wait for indexes to build (can take several minutes)
-
-**Charts Not Loading**
-- Check internet connection (Chart.js loaded from CDN)
-- Verify no ad blockers are blocking CDN
-
-**Mobile Layout Issues**
-- Clear browser cache
-- Test on actual device (not just emulator)
-
----
-
-## Development
-
-### Local Testing
-```bash
-# Serve locally
-firebase serve
-
-# Or use any static server
-npx serve .
-```
-
-### Making Changes
-1. Edit `index.html`
-2. Test locally
-3. Deploy: `firebase deploy`
-
-### Adding New Features
-1. Add module to App controller
-2. Create page section in HTML
-3. Add navigation item
-4. Update Firestore rules if needed
+### v1.0.0
+- Initial deployment.
+- Basic CRUD for inventory, engineers, and DPRs.
+- Hardcoded, shared role-based access.
 
 ---
 
-## Deployment Checklist
+## 📄 License
 
-- [ ] Firebase project created
-- [ ] Authentication enabled (Email/Password)
-- [ ] Firestore database created
-- [ ] Security rules deployed
-- [ ] Indexes deployed
-- [ ] Users created in Auth
-- [ ] User roles mapped in Firestore
-- [ ] Sample data added
-- [ ] App deployed to hosting
-- [ ] Login tested with all roles
-- [ ] Mobile layout verified
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 
-## Contributing
+## 💬 Support
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
----
-
-## License
-
-MIT License - See LICENSE file for details
-
----
-
-## Credits
-
-- **Framework:** Firebase
-- **Icons:** Font Awesome
-- **Charts:** Chart.js
-- **Fonts:** Google Fonts (Inter, JetBrains Mono)
-
----
-
-## Support
-
-For issues and questions:
-1. Check the troubleshooting section
-2. Review Firebase documentation
-3. Check browser console for errors
-
----
-
-## Changelog
-
-### v2.0.0 (2025)
-- Complete mobile-first redesign
-- Modular JavaScript architecture
-- Firebase free tier optimizations
-- Improved accessibility
-- Dark/light theme toggle
-- Bottom navigation for mobile
-- Card-based mobile table views
-
-### v1.0.0 (2024)
-- Initial release
-- Basic CRUD operations
-- Role-based access
-- Dashboard with charts
+For issues, questions, or deployment help:
+1. Consult the Troubleshooting section in the setup guides.
+2. Review the official [Firebase Documentation](https://firebase.google.com/docs).
+3. Inspect your browser's Developer Console (F12) for specific runtime errors.
