@@ -3586,7 +3586,7 @@ switchTab(prefix, tab, btn) {
   };
 
 
-  const DPR = {
+    const DPR = {
     assignmentRemaining: 0,
 
     load() {
@@ -3697,23 +3697,57 @@ switchTab(prefix, tab, btn) {
       this.renderTable(filtered);
     }, 150),
 
-    openAdd() {
+    // ============================================
+    // CRITICAL FIX: openAdd() now async with direct Firestore query
+    // ============================================
+    async openAdd() {
+      console.log('=== DPR.openAdd() called ===');
+      console.log('Current role:', State.currentRole);
+      console.log('Current engineer:', State.currentEngineer);
+      
       document.getElementById('dpr-modal-title').textContent = 'Submit DPR';
       document.getElementById('dpr-edit-id').value = '';
 
       const engSel = document.getElementById('dpr-engineer');
+      const asgnSel = document.getElementById('dpr-assignment');
+      
+      // Reset assignment dropdown first
+      asgnSel.innerHTML = '<option value="">Loading assignments...</option>';
+      
       if (State.currentRole === 'engineer' && State.currentEngineer) {
-        engSel.innerHTML = `<option value="${State.currentEngineer.id}">${Utils.escapeHtml(State.currentEngineer.name)}</option>`;
+        // ENGINEER MODE: Pre-select current engineer
+        engSel.innerHTML = `<option value="${State.currentEngineer.id}" selected>${Utils.escapeHtml(State.currentEngineer.name)}</option>`;
         engSel.disabled = true;
-        this.loadAssignments();
+        engSel.value = State.currentEngineer.id;
+        
+        // CRITICAL: Query Firestore directly for this engineer's assignments
+        await this.loadAssignmentsFromFirestore(State.currentEngineer.id);
+        
       } else {
+        // ADMIN MODE: Allow selecting any engineer
         engSel.disabled = false;
         engSel.innerHTML = '<option value="">Select Engineer</option>' + 
           State.engineers.filter(e => e.status === 'active')
             .map(e => `<option value="${e.id}">${Utils.escapeHtml(e.name)}</option>`).join('');
+        
+        asgnSel.innerHTML = '<option value="">Select Engineer first</option>';
+        
+        // Add onchange handler
+        engSel.onchange = async () => {
+          const selectedEngId = engSel.value;
+          if (selectedEngId) {
+            await this.loadAssignmentsFromFirestore(selectedEngId);
+          } else {
+            asgnSel.innerHTML = '<option value="">Select Engineer first</option>';
+          }
+          // Reset pipe info
+          document.getElementById('dpr-pipeType').value = '';
+          document.getElementById('dpr-diameter').value = '';
+          this.assignmentRemaining = 0;
+        };
       }
 
-      document.getElementById('dpr-assignment').innerHTML = '<option value="">Select Assignment</option>';
+      // Reset all form fields
       document.getElementById('dpr-date').value = Utils.today();
       document.getElementById('dpr-pipeType').value = '';
       document.getElementById('dpr-diameter').value = '';
@@ -3729,52 +3763,144 @@ switchTab(prefix, tab, btn) {
       UI.openModal('modal-dpr');
     },
 
-    loadAssignments() {
-      const engId = document.getElementById('dpr-engineer').value;
-      const asgn = document.getElementById('dpr-assignment');
+    // ============================================
+    // NEW: Direct Firestore query for assignments
+    // ============================================
+    async loadAssignmentsFromFirestore(engId) {
+      console.log('Loading assignments from Firestore for engineer:', engId);
       
-      asgn.innerHTML = '<option value="">Select Assignment</option>';
-      if (!engId) return;
-
-      const myAsgns = State.assignments.filter(a => 
-        a.engineerId === engId && Utils.cleanNum((a.quantity || 0) - (a.assignedUsed || 0)) > 0
-      );
+      const asgnSel = document.getElementById('dpr-assignment');
       
-      asgn.innerHTML = '<option value="">Select Assignment</option>' + 
-        myAsgns.map(a => {
-          const pipe = State.inventory.find(p => p.id === a.pipeId);
-          const rem = Utils.formatQty((a.quantity || 0) - (a.assignedUsed || 0));
-          return `<option value="${a.id}">${Utils.escapeHtml(pipe?.pipeType || '?')} Ø${pipe?.diameter || '?'}mm — ${rem} remaining</option>`;
-        }).join('');
-      
-      document.getElementById('dpr-pipeType').value = '';
-      document.getElementById('dpr-diameter').value = '';
-      this.assignmentRemaining = 0;
-    },
-
-    onAssignmentChange() {
-      const id = document.getElementById('dpr-assignment').value;
-      if (!id) {
-        document.getElementById('dpr-pipeType').value = '';
-        document.getElementById('dpr-diameter').value = '';
-        this.assignmentRemaining = 0;
+      if (!engId) {
+        asgnSel.innerHTML = '<option value="">No engineer selected</option>';
         return;
       }
 
-      const a = State.assignments.find(x => x.id === id);
-      if (!a) return;
+      try {
+        // Direct query to Firestore - bypass State cache
+        const asgnQuery = query(
+          collection(db, 'assignments'), 
+          where('engineerId', '==', engId)
+        );
+        
+        const asgnSnap = await getDocs(asgnQuery);
+        console.log('Firestore query returned', asgnSnap.docs.length, 'assignments');
+        
+        if (!asgnSnap.docs.length) {
+          asgnSel.innerHTML = '<option value="">No assignments found - Contact Admin</option>';
+          UI.toast('No Assignments', 'You have no pipe assignments. Ask admin to create one.', 'warning');
+          return;
+        }
 
-      const pipe = State.inventory.find(p => p.id === a.pipeId);
-      document.getElementById('dpr-pipeType').value = pipe?.pipeType || '';
-      document.getElementById('dpr-diameter').value = pipe?.diameter || '';
-      this.assignmentRemaining = Utils.cleanNum((a.quantity || 0) - (a.assignedUsed || 0));
+        // Filter for assignments with remaining stock
+        const activeAssignments = [];
+        
+        asgnSnap.docs.forEach(doc => {
+          const a = { id: doc.id, ...doc.data() };
+          const used = a.assignedUsed || 0;
+          const total = a.quantity || 0;
+          const remaining = total - used;
+          
+          console.log(`Assignment ${a.id}: total=${total}, used=${used}, remaining=${remaining}`);
+          
+          if (remaining > 0) {
+            activeAssignments.push(a);
+          }
+        });
+        
+        console.log('Active assignments with remaining stock:', activeAssignments.length);
+
+        if (!activeAssignments.length) {
+          asgnSel.innerHTML = '<option value="">No active assignments (all used)</option>';
+          UI.toast('All Used', 'All your assigned pipes have been used. Contact admin for more.', 'warning');
+          return;
+        }
+
+        // Populate dropdown
+        asgnSel.innerHTML = '<option value="">Select Assignment</option>' + 
+          activeAssignments.map(a => {
+            const pipe = State.inventory.find(p => p.id === a.pipeId);
+            const remaining = (a.quantity || 0) - (a.assignedUsed || 0);
+            const pipeName = pipe ? `${pipe.pipeType} Ø${pipe.diameter}mm` : 'Unknown Pipe';
+            return `<option value="${a.id}">${Utils.escapeHtml(pipeName)} — ${remaining} remaining</option>`;
+          }).join('');
+        
+        // Add onchange handler
+        asgnSel.onchange = () => this.onAssignmentChange();
+        
+        // Also update State.assignments cache
+        activeAssignments.forEach(a => {
+          const existingIndex = State.assignments.findIndex(x => x.id === a.id);
+          if (existingIndex >= 0) {
+            State.assignments[existingIndex] = a;
+          } else {
+            State.assignments.push(a);
+          }
+        });
+        
+      } catch (error) {
+        console.error('Error loading assignments:', error);
+        asgnSel.innerHTML = '<option value="">Error loading assignments</option>';
+        UI.toast('Error', 'Failed to load assignments. Please refresh and try again.', 'error');
+      }
+    },
+
+    // ============================================
+    // FIXED: Handle assignment selection
+    // ============================================
+    onAssignmentChange() {
+      const asgnId = document.getElementById('dpr-assignment').value;
+      
+      if (!asgnId || asgnId.includes('No assignments') || asgnId.includes('Error')) {
+        document.getElementById('dpr-pipeType').value = '';
+        document.getElementById('dpr-diameter').value = '';
+        this.assignmentRemaining = 0;
+        document.getElementById('dpr-pipesLeft').value = '';
+        return;
+      }
+
+      // Find assignment in State (should be there from Firestore query)
+      const assignment = State.assignments.find(a => a.id === asgnId);
+      if (!assignment) {
+        console.error('Assignment not found in State:', asgnId);
+        UI.toast('Error', 'Assignment data not found. Please reopen the modal.', 'error');
+        return;
+      }
+
+      const pipe = State.inventory.find(p => p.id === assignment.pipeId);
+      if (!pipe) {
+        console.error('Pipe not found:', assignment.pipeId);
+        UI.toast('Error', 'Pipe details not found', 'error');
+        return;
+      }
+
+      // Populate pipe info
+      document.getElementById('dpr-pipeType').value = pipe.pipeType || '';
+      document.getElementById('dpr-diameter').value = pipe.diameter || '';
+      
+      // Calculate remaining
+      this.assignmentRemaining = (assignment.quantity || 0) - (assignment.assignedUsed || 0);
       document.getElementById('dpr-pipesLeft').value = this.assignmentRemaining;
+      
+      console.log('Selected assignment:', asgnId, 'Remaining:', this.assignmentRemaining);
+    },
+
+    // ============================================
+    // Keep for backward compatibility
+    // ============================================
+    loadAssignments() {
+      const engId = document.getElementById('dpr-engineer').value;
+      this.loadAssignmentsFromFirestore(engId);
+    },
+
+    loadAssignmentsForEngineer(engId) {
+      this.loadAssignmentsFromFirestore(engId);
     },
 
     calcRemaining() {
       const used = Utils.cleanNum(document.getElementById('dpr-pipesUsed').value);
-      const left = Utils.cleanNum(this.assignmentRemaining - used);
-      document.getElementById('dpr-pipesLeft').value = left;
+      const left = this.assignmentRemaining - used;
+      document.getElementById('dpr-pipesLeft').value = left >= 0 ? left : 0;
     },
 
     async save() {
@@ -3784,13 +3910,30 @@ switchTab(prefix, tab, btn) {
       const pipesUsed = Utils.cleanNum(document.getElementById('dpr-pipesUsed').value);
       const meterLaid = Utils.cleanNum(document.getElementById('dpr-meterLaid').value);
 
-      if (!engineerId || !assignmentId || !date || pipesUsed < 0 || meterLaid < 0) {
-        UI.toast('Validation', 'Please fill all required fields.', 'warning');
+      // Validation
+      if (!engineerId) {
+        UI.toast('Validation', 'Please select an engineer.', 'warning');
+        return;
+      }
+      if (!assignmentId || assignmentId.includes('No assignments') || assignmentId.includes('Error')) {
+        UI.toast('Validation', 'Please select a valid assignment.', 'warning');
+        return;
+      }
+      if (!date) {
+        UI.toast('Validation', 'Please select a date.', 'warning');
+        return;
+      }
+      if (pipesUsed <= 0) {
+        UI.toast('Validation', 'Pipes used must be greater than 0.', 'warning');
+        return;
+      }
+      if (meterLaid < 0) {
+        UI.toast('Validation', 'Meters laid cannot be negative.', 'warning');
         return;
       }
 
       if (pipesUsed > this.assignmentRemaining) {
-        UI.toast('Over Usage', `Cannot use ${Utils.formatQty(pipesUsed)} pipes. Only ${Utils.formatQty(this.assignmentRemaining)} remaining in assignment.`, 'warning');
+        UI.toast('Over Usage', `Cannot use ${Utils.formatQty(pipesUsed)} pipes. Only ${Utils.formatQty(this.assignmentRemaining)} remaining.`, 'warning');
         return;
       }
 
@@ -3802,7 +3945,7 @@ switchTab(prefix, tab, btn) {
         diameter: document.getElementById('dpr-diameter').value,
         pipesUsed,
         meterLaid,
-        pipesLeft: Utils.cleanNum(this.assignmentRemaining - pipesUsed),
+        pipesLeft: this.assignmentRemaining - pipesUsed,
         totalJoints: Utils.cleanNum(document.getElementById('dpr-totalJoints').value),
         startJunction: document.getElementById('dpr-startJunction').value.trim(),
         endJunction: document.getElementById('dpr-endJunction').value.trim(),
@@ -3813,19 +3956,24 @@ switchTab(prefix, tab, btn) {
       UI.setButtonLoading(btn, true);
 
       try {
+        // Create DPR
         const docRef = await DataService.add('dprs', data);
         State.dprs.unshift({ id: docRef.id, ...data });
 
+        // Update assignment
         const asgn = State.assignments.find(a => a.id === assignmentId);
         if (asgn) {
-          asgn.assignedUsed = Utils.cleanNum((asgn.assignedUsed || 0) + pipesUsed);
+          asgn.assignedUsed = (asgn.assignedUsed || 0) + pipesUsed;
           await DataService.update('assignments', assignmentId, { assignedUsed: asgn.assignedUsed });
         }
 
         UI.closeModal('modal-dpr');
         this.renderTable(State.dprs);
         UI.toast('Success', 'DPR submitted successfully.', 'success');
+        
+        if (App.Dashboard) App.Dashboard.refreshViews();
       } catch (e) {
+        console.error('DPR save error:', e);
         UI.toast('Error', e.message, 'error');
       } finally {
         UI.setButtonLoading(btn, false);
@@ -3847,6 +3995,10 @@ switchTab(prefix, tab, btn) {
             <div style="margin-top:4px;font-size:15px;font-weight:600">${Utils.escapeHtml(DataService.getEngineerName(d.engineerId))}</div>
           </div>
           <div class="form-group">
+            <label class="form-label">Assignment ID</label>
+            <div style="margin-top:4px;font-family:var(--font-mono);font-size:12px">${d.assignmentId || '—'}</div>
+          </div>
+          <div class="form-group">
             <label class="form-label">Pipe Type</label>
             <div style="margin-top:4px">${Utils.escapeHtml(d.pipeType || '—')}</div>
           </div>
@@ -3859,7 +4011,7 @@ switchTab(prefix, tab, btn) {
             <div style="margin-top:4px;font-family:var(--font-mono);font-size:20px;font-weight:700">${Utils.formatQty(d.pipesUsed)}</div>
           </div>
           <div class="form-group">
-            <label class="form-label">Pipes Left</label>
+            <label class="form-label">Pipes Left in Assignment</label>
             <div style="margin-top:4px;font-family:var(--font-mono);font-size:20px;font-weight:700">${Utils.formatQty(d.pipesLeft)}</div>
           </div>
           <div class="form-group">
@@ -3890,7 +4042,7 @@ switchTab(prefix, tab, btn) {
     },
 
     delete(id) {
-      UI.confirm('Delete this DPR? The pipe count will be reversed.', async () => {
+      UI.confirm('Delete this DPR? The pipe count will be reversed in the assignment.', async () => {
         try {
           const d = State.dprs.find(x => x.id === id);
           await DataService.delete('dprs', id);
@@ -3898,21 +4050,20 @@ switchTab(prefix, tab, btn) {
           if (d?.assignmentId) {
             const a = State.assignments.find(x => x.id === d.assignmentId);
             if (a) {
-              a.assignedUsed = Math.max(0, Utils.cleanNum((a.assignedUsed || 0) - (d.pipesUsed || 0)));
+              a.assignedUsed = Math.max(0, (a.assignedUsed || 0) - (d.pipesUsed || 0));
               await DataService.update('assignments', d.assignmentId, { assignedUsed: a.assignedUsed });
             }
           }
           
           State.dprs = State.dprs.filter(d => d.id !== id);
           this.renderTable(State.dprs);
-          UI.toast('Deleted', 'DPR removed.', 'success');
+          UI.toast('Deleted', 'DPR removed and assignment stock restored.', 'success');
         } catch (e) {
           UI.toast('Error', e.message, 'error');
         }
       });
     },
 
-    // Professional DPR Export
     exportCSV() {
       const rows = [
         ['Date', 'Engineer Name', 'Pipe Type', 'Diameter (mm)', 'Material', 'Pipes Used', 'Meters Laid', 'Total Joints', 'Start Junction', 'End Junction', 'Notes']
