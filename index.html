@@ -4077,15 +4077,39 @@ switchTab(prefix, tab, btn) {
       this.renderTable(filtered);
     }, 150),
 
-    openAdd() {
-      document.getElementById('tgt-modal-title').textContent = 'Set Target';
-      document.getElementById('tgt-edit-id').value = '';
-      document.getElementById('tgt-engineer').innerHTML = '<option value="">Select Engineer</option>' + 
-        State.engineers.map(e => `<option value="${e.id}">${Utils.escapeHtml(e.name)}</option>`).join('');
-      document.getElementById('tgt-month').value = Utils.currentMonth();
-      document.getElementById('tgt-meters').value = '';
-      document.getElementById('tgt-pipes').value = '';
-      UI.openModal('modal-tgt');
+openAdd() {
+      document.getElementById('dpr-modal-title').textContent = 'Submit DPR';
+      document.getElementById('dpr-edit-id').value = '';
+
+      // Clear the dropdown BEFORE we try to populate it
+      document.getElementById('dpr-assignment').innerHTML = '<option value="">Select Assignment</option>';
+
+      const engSel = document.getElementById('dpr-engineer');
+      if (State.currentRole === 'engineer' && State.currentEngineer) {
+        engSel.innerHTML = `<option value="${State.currentEngineer.id}">${Utils.escapeHtml(State.currentEngineer.name)}</option>`;
+        engSel.disabled = true;
+        this.loadAssignments(); // Now this populates the assignments safely
+      } else {
+        engSel.disabled = false;
+        engSel.innerHTML = '<option value="">Select Engineer</option>' + 
+          State.engineers.filter(e => e.status === 'active')
+            .map(e => `<option value="${e.id}">${Utils.escapeHtml(e.name)}</option>`).join('');
+      }
+
+  
+      document.getElementById('dpr-date').value = Utils.today();
+      document.getElementById('dpr-pipeType').value = '';
+      document.getElementById('dpr-diameter').value = '';
+      document.getElementById('dpr-pipesUsed').value = '';
+      document.getElementById('dpr-pipesLeft').value = '';
+      document.getElementById('dpr-meterLaid').value = '';
+      document.getElementById('dpr-totalJoints').value = '';
+      document.getElementById('dpr-startJunction').value = '';
+      document.getElementById('dpr-endJunction').value = '';
+      document.getElementById('dpr-notes').value = '';
+      
+      this.assignmentRemaining = 0;
+      UI.openModal('modal-dpr');
     },
 
     openEdit(id) {
