@@ -467,6 +467,28 @@
     border-color: var(--text-tertiary);
   }
 
+  .btn-danger {
+    background: rgba(239,68,68,0.15);
+    border-color: rgba(239,68,68,0.3);
+    color: var(--danger-400);
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    background: rgba(239,68,68,0.25);
+    border-color: var(--danger-500);
+  }
+
+  .btn-info {
+    background: rgba(59,130,246,0.15);
+    border-color: rgba(59,130,246,0.3);
+    color: var(--info-400);
+  }
+
+  .btn-info:hover:not(:disabled) {
+    background: rgba(59,130,246,0.25);
+    border-color: var(--info-500);
+  }
+
   .btn-sm {
     padding: 8px 14px;
     font-size: 13px;
@@ -631,6 +653,7 @@
   .modal-overlay.open { display: flex; }
   .modal { background: var(--bg-tertiary); border: 1px solid var(--border-primary); border-radius: var(--radius-xl); padding: var(--space-6); width: 100%; max-width: 560px; margin-top: 5vh; animation: modal-in 0.25s ease; box-shadow: var(--shadow-xl); }
   .modal-lg { max-width: 800px; }
+  .modal-xl { max-width: 1100px; }
   @keyframes modal-in { from { opacity: 0; transform: scale(0.96) translateY(-10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
   .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); }
   .modal-header h3 { font-size: 18px; font-weight: 700; }
@@ -715,6 +738,12 @@
   .eng-select-item:hover { border-color: var(--primary-500); background: var(--surface-secondary); transform: translateY(-2px); }
   .eng-select-item .esi-avatar { width: 56px; height: 56px; border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--primary-700), var(--primary-500)); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: white; margin: 0 auto var(--space-3); }
 
+  /* Report-specific styles */
+  .report-summary-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-5); }
+  .report-summary-card { background: var(--surface-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: var(--space-4); text-align: center; }
+  .report-summary-card .rsc-value { font-size: 24px; font-weight: 700; font-family: var(--font-mono); color: var(--primary-400); }
+  .report-summary-card .rsc-label { font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.04em; margin-top: var(--space-1); }
+
   .text-mono { font-family: var(--font-mono); }
   .text-primary { color: var(--primary-400); }
   .text-secondary { color: var(--text-secondary); }
@@ -772,6 +801,7 @@
     .toast { min-width: auto; max-width: none; }
     .eng-select-card { padding: var(--space-5); }
     .eng-select-grid { grid-template-columns: 1fr; }
+    .report-summary-cards { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (max-width: 480px) {
@@ -780,6 +810,7 @@
     .tab-btn { flex: 1; text-align: center; }
     .modal-footer { flex-direction: column; }
     .modal-footer .btn { width: 100%; }
+    .report-summary-cards { grid-template-columns: 1fr; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
@@ -1163,45 +1194,219 @@
         <div class="data-cards" id="tgt-cards"></div>
       </div>
 
-      <!-- REPORTS PAGE -->
+      <!-- REPORTS PAGE - ENHANCED -->
       <div class="page" id="page-reports">
         <div class="page-header">
           <div class="page-header-content">
             <h2>Reports & Analytics</h2>
-            <p>Performance summaries and data insights</p>
+            <p>Comprehensive reporting and data insights</p>
           </div>
-          <button class="btn btn-outline" onclick="App.Reports.exportCSV()">
-            <i class="fa-solid fa-download"></i> Export Report
+        </div>
+        
+        <!-- Report Tabs -->
+        <div class="tabs" id="report-tabs">
+          <button class="tab-btn active" onclick="App.Reports.switchTab('overview', this)">
+            <i class="fa-solid fa-chart-pie"></i> Overview
+          </button>
+          <button class="tab-btn" onclick="App.Reports.switchTab('monthwise', this)">
+            <i class="fa-solid fa-calendar-days"></i> Month-wise Report
+          </button>
+          <button class="tab-btn" onclick="App.Reports.switchTab('engineerwise', this)">
+            <i class="fa-solid fa-hard-hat"></i> Engineer-wise Report
+          </button>
+          <button class="tab-btn" onclick="App.Reports.switchTab('inventory', this)">
+            <i class="fa-solid fa-boxes-stacked"></i> Stock Report
           </button>
         </div>
-        <div class="stats-grid" id="report-stats"></div>
-        <div class="charts-grid">
-          <div class="card">
-            <div class="card-title"><i class="fa-solid fa-chart-line"></i>Monthly Performance</div>
-            <div class="chart-container"><canvas id="chart-report-monthly"></canvas></div>
+
+        <!-- OVERVIEW TAB -->
+        <div class="tab-content active" id="report-tab-overview">
+          <div class="stats-grid" id="report-overview-stats"></div>
+          <div class="charts-grid">
+            <div class="card">
+              <div class="card-title"><i class="fa-solid fa-chart-line"></i>Monthly Performance</div>
+              <div class="chart-container"><canvas id="chart-report-monthly"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="card-title"><i class="fa-solid fa-chart-bar"></i>Engineer-wise Meters Laid</div>
+              <div class="chart-container"><canvas id="chart-report-eng"></canvas></div>
+            </div>
           </div>
-          <div class="card">
-            <div class="card-title"><i class="fa-solid fa-chart-bar"></i>Engineer-wise Meters Laid</div>
-            <div class="chart-container"><canvas id="chart-report-eng"></canvas></div>
+          <div class="card mt-4">
+            <div class="card-title"><i class="fa-solid fa-table"></i>Quick Engineer Summary</div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Engineer</th>
+                    <th>DPRs</th>
+                    <th>Pipes Used</th>
+                    <th>Meters Laid</th>
+                    <th>Joints</th>
+                  </tr>
+                </thead>
+                <tbody id="report-overview-eng-tbody"></tbody>
+              </table>
+            </div>
+            <div class="data-cards" id="report-overview-eng-cards"></div>
           </div>
         </div>
-        <div class="card mt-4">
-          <div class="card-title"><i class="fa-solid fa-table"></i>Engineer Summary</div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Engineer</th>
-                  <th>DPRs</th>
-                  <th>Pipes Used</th>
-                  <th>Meters Laid</th>
-                  <th>Joints</th>
-                </tr>
-              </thead>
-              <tbody id="report-eng-tbody"></tbody>
-            </table>
+
+        <!-- MONTH-WISE REPORT TAB -->
+        <div class="tab-content" id="report-tab-monthwise">
+          <div class="card mb-4">
+            <div class="card-title"><i class="fa-solid fa-filter"></i>Filter Options</div>
+            <div class="filters-bar" style="margin-bottom: 0;">
+              <select class="filter-select" id="report-mw-month" onchange="App.Reports.loadMonthWise()">
+                <option value="">Select Month</option>
+              </select>
+              <select class="filter-select" id="report-mw-engineer" onchange="App.Reports.loadMonthWise()">
+                <option value="">All Engineers</option>
+              </select>
+              <select class="filter-select" id="report-mw-pipe" onchange="App.Reports.loadMonthWise()">
+                <option value="">All Pipe Types</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="App.Reports.exportMonthWiseCSV()">
+                <i class="fa-solid fa-file-csv"></i> Export CSV
+              </button>
+            </div>
           </div>
-          <div class="data-cards" id="report-eng-cards"></div>
+          
+          <div class="report-summary-cards" id="report-mw-summary"></div>
+          
+          <div class="card">
+            <div class="card-title"><i class="fa-solid fa-table-list"></i>Detailed Month-wise Data</div>
+            <div class="table-wrapper" style="max-height: 600px; overflow-y: auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Engineer</th>
+                    <th>Pipe Type</th>
+                    <th>Diameter</th>
+                    <th>Material</th>
+                    <th>Pipes Used</th>
+                    <th>Meters Laid</th>
+                    <th>Joints</th>
+                    <th>Start Junction</th>
+                    <th>End Junction</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="report-mw-tbody"></tbody>
+              </table>
+            </div>
+            <div class="data-cards" id="report-mw-cards"></div>
+          </div>
+        </div>
+
+        <!-- ENGINEER-WISE REPORT TAB -->
+        <div class="tab-content" id="report-tab-engineerwise">
+          <div class="card mb-4">
+            <div class="card-title"><i class="fa-solid fa-filter"></i>Filter Options</div>
+            <div class="filters-bar" style="margin-bottom: 0;">
+              <select class="filter-select" id="report-ew-engineer" onchange="App.Reports.loadEngineerWise()">
+                <option value="">All Engineers</option>
+              </select>
+              <select class="filter-select" id="report-ew-month" onchange="App.Reports.loadEngineerWise()">
+                <option value="">All Months</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="App.Reports.exportEngineerWiseCSV()">
+                <i class="fa-solid fa-file-csv"></i> Export CSV
+              </button>
+            </div>
+          </div>
+          
+          <div class="report-summary-cards" id="report-ew-summary"></div>
+          
+          <div class="card">
+            <div class="card-title"><i class="fa-solid fa-users-viewfinder"></i>Engineer Performance Details</div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Engineer</th>
+                    <th>Emp ID</th>
+                    <th>Status</th>
+                    <th>Total DPRs</th>
+                    <th>Total Pipes Used</th>
+                    <th>Total Meters</th>
+                    <th>Total Joints</th>
+                    <th>Avg Meters/DPR</th>
+                  </tr>
+                </thead>
+                <tbody id="report-ew-tbody"></tbody>
+              </table>
+            </div>
+            <div class="data-cards" id="report-ew-cards"></div>
+          </div>
+          
+          <div class="card mt-4">
+            <div class="card-title"><i class="fa-solid fa-calendar-check"></i>Monthly Breakdown by Engineer</div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Engineer</th>
+                    <th>Month</th>
+                    <th>DPRs</th>
+                    <th>Pipes Used</th>
+                    <th>Meters Laid</th>
+                    <th>Target Meters</th>
+                    <th>Achievement %</th>
+                  </tr>
+                </thead>
+                <tbody id="report-ew-monthly-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- INVENTORY/STOCK REPORT TAB -->
+        <div class="tab-content" id="report-tab-inventory">
+          <div class="card mb-4">
+            <div class="card-title"><i class="fa-solid fa-filter"></i>Filter Options</div>
+            <div class="filters-bar" style="margin-bottom: 0;">
+              <select class="filter-select" id="report-inv-type" onchange="App.Reports.loadInventoryReport()">
+                <option value="">All Pipe Types</option>
+              </select>
+              <select class="filter-select" id="report-inv-status" onchange="App.Reports.loadInventoryReport()">
+                <option value="">All Status</option>
+                <option value="normal">Normal</option>
+                <option value="low">Low Stock</option>
+                <option value="critical">Critical</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="App.Reports.exportInventoryCSV()">
+                <i class="fa-solid fa-file-csv"></i> Export CSV
+              </button>
+            </div>
+          </div>
+          
+          <div class="report-summary-cards" id="report-inv-summary"></div>
+          
+          <div class="card">
+            <div class="card-title"><i class="fa-solid fa-warehouse"></i>Stock Report Details</div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Pipe Type</th>
+                    <th>Diameter</th>
+                    <th>Material</th>
+                    <th>Total Received</th>
+                    <th>Assigned</th>
+                    <th>Available</th>
+                    <th>Used (DPR)</th>
+                    <th>Status</th>
+                    <th>Date Added</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="report-inv-tbody"></tbody>
+              </table>
+            </div>
+            <div class="data-cards" id="report-inv-cards"></div>
+          </div>
         </div>
       </div>
     </main>
@@ -1513,6 +1718,7 @@
     </div>
   </div>
 
+
   <!-- FIREBASE & APP SCRIPT -->
   <script type="module">
 
@@ -1631,11 +1837,16 @@
     notifications: [],
     charts: {},
     dataLoaded: false,
-    isLoading: false
+    isLoading: false,
+    reportFilters: {
+      monthWise: { month: '', engineer: '', pipe: '' },
+      engineerWise: { engineer: '', month: '' },
+      inventory: { type: '', status: '' }
+    }
   };
 
   // ============================================
-  // UTILITY FUNCTIONS (Decimal Upgrade)
+  // UTILITY FUNCTIONS (Enhanced for Professional Exports)
   // ============================================
   const Utils = {
     cleanNum(val) {
@@ -1672,6 +1883,12 @@
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     },
 
+    getLastMonth() {
+      const d = new Date();
+      d.setMonth(d.getMonth() - 1);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    },
+
     getGreeting() {
       const h = new Date().getHours();
       if (h >= 5 && h < 12) return 'Good Morning';
@@ -1684,6 +1901,16 @@
       const months = [];
       const d = new Date();
       for (let i = 5; i >= 0; i--) {
+        const t = new Date(d.getFullYear(), d.getMonth() - i, 1);
+        months.push(`${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}`);
+      }
+      return months;
+    },
+
+    getAllMonths() {
+      const months = [];
+      const d = new Date();
+      for (let i = 11; i >= 0; i--) {
         const t = new Date(d.getFullYear(), d.getMonth() - i, 1);
         months.push(`${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}`);
       }
@@ -1705,14 +1932,48 @@
       return div.innerHTML;
     },
 
+    // Professional CSV Export with proper escaping for Excel
+    escapeCSV(value) {
+      if (value === null || value === undefined) return '';
+      let str = String(value);
+      // Escape quotes by doubling them
+      str = str.replace(/"/g, '""');
+      // Wrap in quotes if contains comma, newline, or quote
+      if (str.includes(',') || str.includes('\n') || str.includes('"') || str.includes(';')) {
+        str = `"${str}"`;
+      }
+      return str;
+    },
+
+    // Generate Excel-friendly CSV with BOM
+    generateCSV(rows) {
+      const csvContent = rows.map(row => 
+        row.map(cell => this.escapeCSV(cell)).join(',')
+      ).join('\r\n');
+      // Add BOM for Excel UTF-8 recognition
+      return '\uFEFF' + csvContent;
+    },
+
+    // Download CSV with proper filename
     downloadCSV(rows, filename) {
-      const csv = rows.map(r => r.map(c => (`${c || ''}`).replace(/,/g, ';')).join(',')).join('\n');
+      const csv = this.generateCSV(rows);
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
+      link.href = url;
       link.download = filename;
+      document.body.appendChild(link);
       link.click();
-      URL.revokeObjectURL(link.href);
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    },
+
+    // Generate timestamped filename
+    generateFilename(baseName) {
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+      return `${baseName}_${dateStr}_${timeStr}.csv`;
     }
   };
 
@@ -1809,8 +2070,10 @@
       document.body.style.overflow = '';
     },
 
-    switchTab(prefix, tab, btn) {
-      const page = document.getElementById(`page-${prefix}`);
+switchTab(prefix, tab, btn) {
+      // Find the closest parent with the class '.page' automatically
+      const page = btn.closest('.page'); 
+      
       page.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       page.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       btn.classList.add('active');
@@ -2148,6 +2411,7 @@
     }
   };
 
+
   const Dashboard = {
     currentProject: '',
 
@@ -2241,7 +2505,7 @@
 
         return `
           <tr>
-            <td><strong>${Utils.escapeHtml(pipe.pipeType)}</strong></td>
+            <td><strong>${Utils.escapeHtml(pipe.pipeType || '—')}</strong></td>
             <td>${pipe.diameter}mm</td>
             <td>${Utils.escapeHtml(pipe.material || 'GI')}</td>
             <td class="text-mono">${Utils.formatQty(pipe.quantity)}</td>
@@ -2458,16 +2722,16 @@
       const reportName = this.currentProject ? `Dashboard_Report_${this.currentProject}` : 'Dashboard_Overall_Report';
 
       let rows = [
-        ['Report:', this.currentProject || 'Overall Overview'],
-        ['Date:', Utils.today()],
+        ['Report', this.currentProject || 'Overall Overview'],
+        ['Generated Date', new Date().toLocaleString('en-IN')],
         [],
-        ['--- SUMMARY STATS ---'],
-        ['Total Warehouse Stock Ready', Utils.formatQty(warehouseStock)],
-        ['Total Pipes Issued to Field', Utils.formatQty(totalAssigned)],
+        ['SUMMARY STATS'],
+        ['Total Warehouse Stock Ready', warehouseStock],
+        ['Total Pipes Issued to Field', totalAssigned],
         ['Total Meters Laid', totalMeters.toFixed(2)],
         ['Total DPRs Submitted', dprs.length],
         [],
-        ['--- STOCK BREAKDOWN ---'],
+        ['STOCK BREAKDOWN'],
         ['Project/Type', 'Diameter (mm)', 'Material', 'Procured (Total)', 'Issued', 'Available in Warehouse']
       ];
 
@@ -2478,13 +2742,13 @@
           pipe.pipeType, 
           pipe.diameter, 
           pipe.material || 'GI', 
-          Utils.formatQty(pipe.quantity), 
-          Utils.formatQty(assigned), 
-          Utils.formatQty(avail)
+          pipe.quantity, 
+          assigned, 
+          avail
         ]);
       });
 
-      Utils.downloadCSV(rows, `${reportName.replace(/\s+/g, '_')}.csv`);
+      Utils.downloadCSV(rows, Utils.generateFilename(reportName.replace(/\s+/g, '_')));
       UI.toast('Exported', 'Dashboard report downloaded.', 'success');
     }
   };
@@ -2778,12 +3042,42 @@
       });
     },
 
+    // Professional Inventory Export
     exportCSV() {
-      const rows = [['Pipe Type', 'Diameter', 'Material', 'Total Qty', 'Notes']];
-      State.inventory.forEach(p => rows.push([p.pipeType, p.diameter, p.material, Utils.formatQty(p.quantity), p.notes]));
-      Utils.downloadCSV(rows, 'inventory.csv');
+      const rows = [
+        ['Pipe Type', 'Diameter (mm)', 'Material', 'Total Quantity Received', 'Total Quantity Assigned', 'Current Available Quantity', 'Used Quantity (DPR)', 'Status', 'Date Added', 'Notes']
+      ];
+      
+      State.inventory.forEach(p => {
+        const assigned = Utils.cleanNum(State.assignments.filter(a => a.pipeId === p.id).reduce((s, a) => s + (a.quantity || 0), 0));
+        const avail = Utils.cleanNum((p.quantity || 0) - assigned);
+        const used = Utils.cleanNum(State.dprs.filter(d => {
+          const asgn = State.assignments.find(a => a.id === d.assignmentId);
+          return asgn && asgn.pipeId === p.id;
+        }).reduce((s, d) => s + (d.pipesUsed || 0), 0));
+        
+        const pct = p.quantity > 0 ? avail / p.quantity : 0;
+        const status = pct < 0.1 ? 'Critical' : pct < 0.25 ? 'Low' : 'Normal';
+        
+        rows.push([
+          p.pipeType,
+          p.diameter,
+          p.material || '',
+          p.quantity,
+          assigned,
+          avail,
+          used,
+          status,
+          p.dateAdded || '',
+          p.notes || ''
+        ]);
+      });
+      
+      Utils.downloadCSV(rows, Utils.generateFilename('Inventory_Report'));
+      UI.toast('Exported', 'Inventory report downloaded.', 'success');
     }
   };
+
 
   const Engineers = {
     load() {
@@ -3264,23 +3558,33 @@
       });
     },
 
+    // Professional Assignment Export
     exportCSV() {
-      const rows = [['Engineer', 'Pipe Type', 'Diameter', 'Qty Assigned', 'Used', 'Remaining', 'Notes']];
+      const rows = [
+        ['Engineer Name', 'Pipe Type', 'Diameter (mm)', 'Material', 'Quantity Assigned', 'Quantity Used', 'Remaining Quantity', 'Assignment Date', 'Notes']
+      ];
+      
       State.assignments.forEach(a => {
         const pipe = State.inventory.find(p => p.id === a.pipeId);
+        const remaining = Utils.cleanNum((a.quantity || 0) - (a.assignedUsed || 0));
         rows.push([
           DataService.getEngineerName(a.engineerId),
           pipe?.pipeType || '',
           pipe?.diameter || '',
-          Utils.formatQty(a.quantity),
-          Utils.formatQty(a.assignedUsed),
-          Utils.formatQty(Utils.cleanNum((a.quantity || 0) - (a.assignedUsed || 0))),
-          a.notes
+          pipe?.material || '',
+          a.quantity,
+          a.assignedUsed || 0,
+          remaining,
+          a.dateAssigned || '',
+          a.notes || ''
         ]);
       });
-      Utils.downloadCSV(rows, 'assignments.csv');
+      
+      Utils.downloadCSV(rows, Utils.generateFilename('Assignments_Report'));
+      UI.toast('Exported', 'Assignments report downloaded.', 'success');
     }
   };
+
 
   const DPR = {
     assignmentRemaining: 0,
@@ -3566,6 +3870,18 @@
             <label class="form-label">Total Joints</label>
             <div style="margin-top:4px;font-family:var(--font-mono)">${Utils.formatQty(d.totalJoints)}</div>
           </div>
+          ${d.startJunction ? `
+          <div class="form-group">
+            <label class="form-label">Start Junction</label>
+            <div style="margin-top:4px">${Utils.escapeHtml(d.startJunction)}</div>
+          </div>
+          ` : ''}
+          ${d.endJunction ? `
+          <div class="form-group">
+            <label class="form-label">End Junction</label>
+            <div style="margin-top:4px">${Utils.escapeHtml(d.endJunction)}</div>
+          </div>
+          ` : ''}
         </div>
         ${d.notes ? `<div><div class="form-label">Notes</div><div style="margin-top:4px;color:var(--text-secondary)">${Utils.escapeHtml(d.notes)}</div></div>` : ''}
       `;
@@ -3596,19 +3912,33 @@
       });
     },
 
+    // Professional DPR Export
     exportCSV() {
-      const rows = [['Date', 'Engineer', 'Pipe Type', 'Diameter', 'Pipes Used', 'Meters Laid', 'Joints', 'Notes']];
-      State.dprs.forEach(d => rows.push([
-        d.date,
-        DataService.getEngineerName(d.engineerId),
-        d.pipeType,
-        d.diameter,
-        Utils.formatQty(d.pipesUsed),
-        Utils.cleanNum(d.meterLaid || 0).toFixed(2),
-        Utils.formatQty(d.totalJoints),
-        d.notes
-      ]));
-      Utils.downloadCSV(rows, 'dpr.csv');
+      const rows = [
+        ['Date', 'Engineer Name', 'Pipe Type', 'Diameter (mm)', 'Material', 'Pipes Used', 'Meters Laid', 'Total Joints', 'Start Junction', 'End Junction', 'Notes']
+      ];
+      
+      State.dprs.forEach(d => {
+        const asgn = State.assignments.find(a => a.id === d.assignmentId);
+        const pipe = asgn ? State.inventory.find(p => p.id === asgn.pipeId) : null;
+        
+        rows.push([
+          d.date,
+          DataService.getEngineerName(d.engineerId),
+          d.pipeType || '',
+          d.diameter || '',
+          pipe?.material || '',
+          d.pipesUsed,
+          Utils.cleanNum(d.meterLaid || 0).toFixed(2),
+          d.totalJoints || 0,
+          d.startJunction || '',
+          d.endJunction || '',
+          d.notes || ''
+        ]);
+      });
+      
+      Utils.downloadCSV(rows, Utils.generateFilename('DPR_Report'));
+      UI.toast('Exported', 'DPR report downloaded.', 'success');
     }
   };
 
@@ -3824,9 +4154,54 @@
     }
   };
 
+
+  // ============================================
+  // ENHANCED REPORTS MODULE
+  // ============================================
   const Reports = {
+    currentTab: 'overview',
+
+    // Switch between report tabs
+    switchTab(tab, btn) {
+      this.currentTab = tab;
+      
+      // Update tab buttons
+      document.querySelectorAll('#report-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Update tab content
+      document.querySelectorAll('#page-reports .tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById(`report-tab-${tab}`).classList.add('active');
+      
+      // Load tab-specific data
+      switch(tab) {
+        case 'overview':
+          this.loadOverview();
+          break;
+        case 'monthwise':
+          this.initMonthWiseFilters();
+          this.loadMonthWise();
+          break;
+        case 'engineerwise':
+          this.initEngineerWiseFilters();
+          this.loadEngineerWise();
+          break;
+        case 'inventory':
+          this.initInventoryFilters();
+          this.loadInventoryReport();
+          break;
+      }
+    },
+
+    // ============================================
+    // OVERVIEW TAB
+    // ============================================
     load() {
-      const statsEl = document.getElementById('report-stats');
+      this.loadOverview();
+    },
+
+    loadOverview() {
+      const statsEl = document.getElementById('report-overview-stats');
       const totalMeters = Utils.cleanNum(State.dprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
       const totalPipes = Utils.cleanNum(State.dprs.reduce((s, d) => s + (d.pipesUsed || 0), 0));
       const totalJoints = Utils.cleanNum(State.dprs.reduce((s, d) => s + (d.totalJoints || 0), 0));
@@ -3841,8 +4216,8 @@
         ${Dashboard.statCard('Inventory Types', State.inventory.length, 'fa-boxes-stacked', 'rgba(239,68,68,0.15)', 'Pipe types')}
       `;
 
-      const engTbody = document.getElementById('report-eng-tbody');
-      const engCards = document.getElementById('report-eng-cards');
+      const engTbody = document.getElementById('report-overview-eng-tbody');
+      const engCards = document.getElementById('report-overview-eng-cards');
       
       const engData = State.engineers.map(e => {
         const dprs = State.dprs.filter(d => d.engineerId === e.id);
@@ -3960,19 +4335,674 @@
       });
     },
 
-    exportCSV() {
-      const rows = [['Engineer', 'DPRs', 'Pipes Used', 'Meters Laid', 'Joints']];
-      State.engineers.forEach(e => {
-        const dprs = State.dprs.filter(d => d.engineerId === e.id);
+    // ============================================
+    // MONTH-WISE REPORT TAB
+    // ============================================
+    initMonthWiseFilters() {
+      // Populate month filter (default to last month)
+      const monthSel = document.getElementById('report-mw-month');
+      const months = Utils.getAllMonths();
+      const lastMonth = Utils.getLastMonth();
+      
+      monthSel.innerHTML = '<option value="">Select Month</option>' + 
+        months.map(m => `<option value="${m}" ${m === lastMonth ? 'selected' : ''}>${Utils.formatMonth(m)}</option>`).join('');
+      
+      // Populate engineer filter
+      const engSel = document.getElementById('report-mw-engineer');
+      engSel.innerHTML = '<option value="">All Engineers</option>' + 
+        State.engineers.map(e => `<option value="${e.id}">${Utils.escapeHtml(e.name)}</option>`).join('');
+      
+      // Populate pipe type filter
+      const pipeTypes = [...new Set(State.inventory.map(p => p.pipeType))].filter(Boolean);
+      const pipeSel = document.getElementById('report-mw-pipe');
+      pipeSel.innerHTML = '<option value="">All Pipe Types</option>' + 
+        pipeTypes.map(t => `<option value="${t}">${t}</option>`).join('');
+    },
+
+    loadMonthWise() {
+      const month = document.getElementById('report-mw-month').value;
+      const engineerId = document.getElementById('report-mw-engineer').value;
+      const pipeType = document.getElementById('report-mw-pipe').value;
+      
+      // Save filters
+      State.reportFilters.monthWise = { month, engineer: engineerId, pipe: pipeType };
+      
+      // Filter DPRs
+      let filteredDPRs = State.dprs;
+      
+      if (month) {
+        filteredDPRs = filteredDPRs.filter(d => d.date && d.date.startsWith(month));
+      }
+      if (engineerId) {
+        filteredDPRs = filteredDPRs.filter(d => d.engineerId === engineerId);
+      }
+      if (pipeType) {
+        filteredDPRs = filteredDPRs.filter(d => d.pipeType === pipeType);
+      }
+      
+      // Role-based filtering for engineers
+      if (State.currentRole === 'engineer' && State.currentEngineer) {
+        filteredDPRs = filteredDPRs.filter(d => d.engineerId === State.currentEngineer.id);
+      }
+      
+      // Sort by date
+      filteredDPRs = filteredDPRs.sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      // Calculate summary
+      const totalDPRs = filteredDPRs.length;
+      const totalPipes = Utils.cleanNum(filteredDPRs.reduce((s, d) => s + (d.pipesUsed || 0), 0));
+      const totalMeters = Utils.cleanNum(filteredDPRs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
+      const totalJoints = Utils.cleanNum(filteredDPRs.reduce((s, d) => s + (d.totalJoints || 0), 0));
+      
+      // Render summary cards
+      document.getElementById('report-mw-summary').innerHTML = `
+        <div class="report-summary-card">
+          <div class="rsc-value">${totalDPRs}</div>
+          <div class="rsc-label">Total DPRs</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value">${Utils.formatQty(totalPipes)}</div>
+          <div class="rsc-label">Pipes Used</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value">${totalMeters.toFixed(1)}m</div>
+          <div class="rsc-label">Meters Laid</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value">${Utils.formatQty(totalJoints)}</div>
+          <div class="rsc-label">Joints</div>
+        </div>
+      `;
+      
+      // Render table
+      const tbody = document.getElementById('report-mw-tbody');
+      const cards = document.getElementById('report-mw-cards');
+      
+      if (!filteredDPRs.length) {
+        const empty = `
+          <div class="empty-state">
+            <i class="fa-solid fa-calendar-xmark"></i>
+            <h3>No data found</h3>
+            <p>Try adjusting your filters</p>
+          </div>
+        `;
+        tbody.innerHTML = `<tr><td colspan="11">${empty}</td></tr>`;
+        cards.innerHTML = empty;
+        return;
+      }
+      
+      tbody.innerHTML = filteredDPRs.map(d => {
+        const asgn = State.assignments.find(a => a.id === d.assignmentId);
+        const pipe = asgn ? State.inventory.find(p => p.id === asgn.pipeId) : null;
+        
+        return `
+          <tr>
+            <td>${Utils.formatDate(d.date)}</td>
+            <td><strong>${Utils.escapeHtml(DataService.getEngineerName(d.engineerId))}</strong></td>
+            <td>${Utils.escapeHtml(d.pipeType || '—')}</td>
+            <td class="text-mono">${d.diameter || '—'}mm</td>
+            <td>${Utils.escapeHtml(pipe?.material || '—')}</td>
+            <td class="text-mono">${Utils.formatQty(d.pipesUsed)}</td>
+            <td class="text-mono">${Utils.cleanNum(d.meterLaid || 0).toFixed(1)}m</td>
+            <td class="text-mono">${Utils.formatQty(d.totalJoints)}</td>
+            <td>${Utils.escapeHtml(d.startJunction || '—')}</td>
+            <td>${Utils.escapeHtml(d.endJunction || '—')}</td>
+            <td>${Utils.escapeHtml(d.notes || '—')}</td>
+          </tr>
+        `;
+      }).join('');
+      
+      // Render mobile cards
+      cards.innerHTML = filteredDPRs.map(d => `
+        <div class="data-card">
+          <div class="data-card-header">
+            <div class="data-card-title">${Utils.formatDate(d.date)}</div>
+            <span class="badge badge-primary">${Utils.cleanNum(d.meterLaid || 0).toFixed(1)}m</span>
+          </div>
+          <div class="data-card-row">
+            <span class="data-card-label">Engineer</span>
+            <span class="data-card-value">${Utils.escapeHtml(DataService.getEngineerName(d.engineerId))}</span>
+          </div>
+          <div class="data-card-row">
+            <span class="data-card-label">Pipe Type</span>
+            <span class="data-card-value">${Utils.escapeHtml(d.pipeType || '—')}</span>
+          </div>
+          <div class="data-card-row">
+            <span class="data-card-label">Pipes Used</span>
+            <span class="data-card-value text-mono">${Utils.formatQty(d.pipesUsed)}</span>
+          </div>
+          <div class="data-card-row">
+            <span class="data-card-label">Meters Laid</span>
+            <span class="data-card-value text-mono">${Utils.cleanNum(d.meterLaid || 0).toFixed(1)}m</span>
+          </div>
+          <div class="data-card-row">
+            <span class="data-card-label">Joints</span>
+            <span class="data-card-value text-mono">${Utils.formatQty(d.totalJoints)}</span>
+          </div>
+        </div>
+      `).join('');
+    },
+
+    // Professional Month-wise Export
+    exportMonthWiseCSV() {
+      const { month, engineer, pipe } = State.reportFilters.monthWise;
+      
+      let filteredDPRs = State.dprs;
+      if (month) filteredDPRs = filteredDPRs.filter(d => d.date && d.date.startsWith(month));
+      if (engineer) filteredDPRs = filteredDPRs.filter(d => d.engineerId === engineer);
+      if (pipe) filteredDPRs = filteredDPRs.filter(d => d.pipeType === pipe);
+      
+      // Role-based filtering
+      if (State.currentRole === 'engineer' && State.currentEngineer) {
+        filteredDPRs = filteredDPRs.filter(d => d.engineerId === State.currentEngineer.id);
+      }
+      
+      filteredDPRs = filteredDPRs.sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      const rows = [
+        ['Month-wise Report'],
+        ['Generated', new Date().toLocaleString('en-IN')],
+        ['Filter Month', month ? Utils.formatMonth(month) : 'All'],
+        ['Filter Engineer', engineer ? DataService.getEngineerName(engineer) : 'All'],
+        ['Filter Pipe Type', pipe || 'All'],
+        [],
+        ['Date', 'Engineer Name', 'Pipe Type', 'Diameter (mm)', 'Material', 'Pipes Used', 'Meters Laid', 'Total Joints', 'Start Junction', 'End Junction', 'Notes']
+      ];
+      
+      filteredDPRs.forEach(d => {
+        const asgn = State.assignments.find(a => a.id === d.assignmentId);
+        const pipeData = asgn ? State.inventory.find(p => p.id === asgn.pipeId) : null;
+        
         rows.push([
-          e.name,
-          dprs.length,
-          Utils.formatQty(dprs.reduce((s, d) => s + (d.pipesUsed || 0), 0)),
-          Utils.cleanNum(dprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0)).toFixed(2),
-          Utils.formatQty(dprs.reduce((s, d) => s + (d.totalJoints || 0), 0))
+          d.date,
+          DataService.getEngineerName(d.engineerId),
+          d.pipeType || '',
+          d.diameter || '',
+          pipeData?.material || '',
+          d.pipesUsed,
+          Utils.cleanNum(d.meterLaid || 0).toFixed(2),
+          d.totalJoints || 0,
+          d.startJunction || '',
+          d.endJunction || '',
+          d.notes || ''
         ]);
       });
-      Utils.downloadCSV(rows, 'report.csv');
+      
+      const filename = month ? `MonthWise_Report_${month}` : 'MonthWise_Report_All';
+      Utils.downloadCSV(rows, Utils.generateFilename(filename));
+      UI.toast('Exported', 'Month-wise report downloaded.', 'success');
+    },
+
+    // ============================================
+    // ENGINEER-WISE REPORT TAB
+    // ============================================
+    initEngineerWiseFilters() {
+      // Populate engineer filter
+      const engSel = document.getElementById('report-ew-engineer');
+      engSel.innerHTML = '<option value="">All Engineers</option>' + 
+        State.engineers.map(e => `<option value="${e.id}">${Utils.escapeHtml(e.name)}</option>`).join('');
+      
+      // Populate month filter
+      const months = [...new Set(State.dprs.map(d => d.date?.slice(0, 7)).filter(Boolean))].sort().reverse();
+      const monthSel = document.getElementById('report-ew-month');
+      monthSel.innerHTML = '<option value="">All Months</option>' + 
+        months.map(m => `<option value="${m}">${Utils.formatMonth(m)}</option>`).join('');
+    },
+
+    loadEngineerWise() {
+      const engineerId = document.getElementById('report-ew-engineer').value;
+      const month = document.getElementById('report-ew-month').value;
+      
+      State.reportFilters.engineerWise = { engineer: engineerId, month };
+      
+      // Filter engineers
+      let filteredEngineers = State.engineers;
+      if (engineerId) {
+        filteredEngineers = filteredEngineers.filter(e => e.id === engineerId);
+      }
+      
+      // Role-based filtering
+      if (State.currentRole === 'engineer' && State.currentEngineer) {
+        filteredEngineers = filteredEngineers.filter(e => e.id === State.currentEngineer.id);
+      }
+      
+      // Calculate engineer stats
+      const engStats = filteredEngineers.map(e => {
+        let dprs = State.dprs.filter(d => d.engineerId === e.id);
+        if (month) {
+          dprs = dprs.filter(d => d.date && d.date.startsWith(month));
+        }
+        
+        const asgns = State.assignments.filter(a => a.engineerId === e.id);
+        
+        return {
+          ...e,
+          dprCount: dprs.length,
+          pipesUsed: Utils.cleanNum(dprs.reduce((s, d) => s + (d.pipesUsed || 0), 0)),
+          metersLaid: Utils.cleanNum(dprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0)),
+          joints: Utils.cleanNum(dprs.reduce((s, d) => s + (d.totalJoints || 0), 0)),
+          totalAssigned: Utils.cleanNum(asgns.reduce((s, a) => s + (a.quantity || 0), 0)),
+          totalAssignedUsed: Utils.cleanNum(asgns.reduce((s, a) => s + (a.assignedUsed || 0), 0)),
+          avgMetersPerDPR: dprs.length > 0 ? Utils.cleanNum(dprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0) / dprs.length) : 0
+        };
+      });
+      
+      // Calculate totals
+      const totalDPRs = engStats.reduce((s, e) => s + e.dprCount, 0);
+      const totalPipes = engStats.reduce((s, e) => s + e.pipesUsed, 0);
+      const totalMeters = engStats.reduce((s, e) => s + e.metersLaid, 0);
+      const totalJoints = engStats.reduce((s, e) => s + e.joints, 0);
+      
+      // Render summary cards
+      document.getElementById('report-ew-summary').innerHTML = `
+        <div class="report-summary-card">
+          <div class="rsc-value">${engStats.length}</div>
+          <div class="rsc-label">Engineers</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value">${totalDPRs}</div>
+          <div class="rsc-label">Total DPRs</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value">${Utils.formatQty(totalPipes)}</div>
+          <div class="rsc-label">Pipes Used</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value">${totalMeters.toFixed(1)}m</div>
+          <div class="rsc-label">Meters Laid</div>
+        </div>
+      `;
+      
+      // Render main table
+      const tbody = document.getElementById('report-ew-tbody');
+      const cards = document.getElementById('report-ew-cards');
+      
+      if (!engStats.length) {
+        const empty = `
+          <div class="empty-state">
+            <i class="fa-solid fa-users-slash"></i>
+            <h3>No engineers found</h3>
+          </div>
+        `;
+        tbody.innerHTML = `<tr><td colspan="8">${empty}</td></tr>`;
+        cards.innerHTML = empty;
+      } else {
+        tbody.innerHTML = engStats.map(e => `
+          <tr>
+            <td><strong>${Utils.escapeHtml(e.name)}</strong></td>
+            <td class="text-mono">${e.empId}</td>
+            <td><span class="badge ${e.status === 'active' ? 'badge-success' : 'badge-muted'}">${e.status}</span></td>
+            <td class="text-mono">${e.dprCount}</td>
+            <td class="text-mono">${Utils.formatQty(e.pipesUsed)}</td>
+            <td class="text-mono">${e.metersLaid.toFixed(1)}m</td>
+            <td class="text-mono">${Utils.formatQty(e.joints)}</td>
+            <td class="text-mono">${e.avgMetersPerDPR.toFixed(1)}m</td>
+          </tr>
+        `).join('');
+        
+        cards.innerHTML = engStats.map(e => `
+          <div class="data-card">
+            <div class="data-card-header">
+              <div class="data-card-title">${Utils.escapeHtml(e.name)}</div>
+              <span class="badge ${e.status === 'active' ? 'badge-success' : 'badge-muted'}">${e.status}</span>
+            </div>
+            <div class="data-card-row">
+              <span class="data-card-label">Employee ID</span>
+              <span class="data-card-value text-mono">${e.empId}</span>
+            </div>
+            <div class="data-card-row">
+              <span class="data-card-label">DPRs</span>
+              <span class="data-card-value text-mono">${e.dprCount}</span>
+            </div>
+            <div class="data-card-row">
+              <span class="data-card-label">Pipes Used</span>
+              <span class="data-card-value text-mono">${Utils.formatQty(e.pipesUsed)}</span>
+            </div>
+            <div class="data-card-row">
+              <span class="data-card-label">Meters Laid</span>
+              <span class="data-card-value text-mono">${e.metersLaid.toFixed(1)}m</span>
+            </div>
+            <div class="data-card-row">
+              <span class="data-card-label">Avg Meters/DPR</span>
+              <span class="data-card-value text-mono">${e.avgMetersPerDPR.toFixed(1)}m</span>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      // Render monthly breakdown
+      this.renderEngineerMonthlyBreakdown(filteredEngineers, month);
+    },
+
+    renderEngineerMonthlyBreakdown(engineers, selectedMonth) {
+      const tbody = document.getElementById('report-ew-monthly-tbody');
+      
+      // Get all months with data or use selected month
+      let months = selectedMonth ? [selectedMonth] : 
+        [...new Set(State.dprs.map(d => d.date?.slice(0, 7)).filter(Boolean))].sort().reverse();
+      
+      const rows = [];
+      
+      engineers.forEach(e => {
+        months.forEach(m => {
+          const dprs = State.dprs.filter(d => d.engineerId === e.id && d.date && d.date.startsWith(m));
+          if (dprs.length === 0 && selectedMonth) return; // Skip empty months if filtering
+          
+          const pipesUsed = Utils.cleanNum(dprs.reduce((s, d) => s + (d.pipesUsed || 0), 0));
+          const metersLaid = Utils.cleanNum(dprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
+          
+          const target = State.targets.find(t => t.engineerId === e.id && t.month === m);
+          const targetMeters = target ? target.targetMeters : 0;
+          const achievement = targetMeters > 0 ? Math.min(100, (metersLaid / targetMeters) * 100).toFixed(1) : 0;
+          
+          rows.push({
+            engineer: e.name,
+            month: m,
+            dprCount: dprs.length,
+            pipesUsed,
+            metersLaid,
+            targetMeters,
+            achievement
+          });
+        });
+      });
+      
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-state" style="padding: 40px;"><i class="fa-solid fa-calendar-xmark"></i><h3>No monthly data</h3></td></tr>`;
+        return;
+      }
+      
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td><strong>${Utils.escapeHtml(r.engineer)}</strong></td>
+          <td>${Utils.formatMonth(r.month)}</td>
+          <td class="text-mono">${r.dprCount}</td>
+          <td class="text-mono">${Utils.formatQty(r.pipesUsed)}</td>
+          <td class="text-mono">${r.metersLaid.toFixed(1)}m</td>
+          <td class="text-mono">${r.targetMeters > 0 ? r.targetMeters.toFixed(0) + 'm' : '—'}</td>
+          <td>
+            ${r.targetMeters > 0 ? `
+              <div class="progress-wrapper" style="width: 100px; display: inline-block; vertical-align: middle;">
+                <div class="progress-bar ${r.achievement >= 80 ? 'success' : r.achievement >= 50 ? 'warning' : 'danger'}" style="width:${r.achievement}%"></div>
+              </div>
+              <span class="text-mono" style="margin-left: 8px;">${r.achievement}%</span>
+            ` : '<span class="text-muted">—</span>'}
+          </td>
+        </tr>
+      `).join('');
+    },
+
+    // Professional Engineer-wise Export
+    exportEngineerWiseCSV() {
+      const { engineer, month } = State.reportFilters.engineerWise;
+      
+      let filteredEngineers = State.engineers;
+      if (engineer) filteredEngineers = filteredEngineers.filter(e => e.id === engineer);
+      if (State.currentRole === 'engineer' && State.currentEngineer) {
+        filteredEngineers = filteredEngineers.filter(e => e.id === State.currentEngineer.id);
+      }
+      
+      const rows = [
+        ['Engineer-wise Report'],
+        ['Generated', new Date().toLocaleString('en-IN')],
+        ['Filter Engineer', engineer ? DataService.getEngineerName(engineer) : 'All'],
+        ['Filter Month', month ? Utils.formatMonth(month) : 'All'],
+        [],
+        ['Engineer Name', 'Employee ID', 'Status', 'Total DPRs', 'Total Pipes Used', 'Total Meters Laid', 'Total Joints', 'Avg Meters/DPR', 'Total Assigned', 'Total Used from Assignment']
+      ];
+      
+      filteredEngineers.forEach(e => {
+        let dprs = State.dprs.filter(d => d.engineerId === e.id);
+        if (month) dprs = dprs.filter(d => d.date && d.date.startsWith(month));
+        
+        const asgns = State.assignments.filter(a => a.engineerId === e.id);
+        const pipesUsed = Utils.cleanNum(dprs.reduce((s, d) => s + (d.pipesUsed || 0), 0));
+        const metersLaid = Utils.cleanNum(dprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
+        const avgMeters = dprs.length > 0 ? (metersLaid / dprs.length).toFixed(2) : 0;
+        
+        rows.push([
+          e.name,
+          e.empId,
+          e.status || 'active',
+          dprs.length,
+          pipesUsed,
+          metersLaid.toFixed(2),
+          dprs.reduce((s, d) => s + (d.totalJoints || 0), 0),
+          avgMeters,
+          asgns.reduce((s, a) => s + (a.quantity || 0), 0),
+          asgns.reduce((s, a) => s + (a.assignedUsed || 0), 0)
+        ]);
+      });
+      
+      Utils.downloadCSV(rows, Utils.generateFilename('EngineerWise_Report'));
+      UI.toast('Exported', 'Engineer-wise report downloaded.', 'success');
+    },
+
+    // ============================================
+    // INVENTORY/STOCK REPORT TAB
+    // ============================================
+    initInventoryFilters() {
+      // Populate pipe type filter
+      const pipeTypes = [...new Set(State.inventory.map(p => p.pipeType))].filter(Boolean);
+      const typeSel = document.getElementById('report-inv-type');
+      typeSel.innerHTML = '<option value="">All Pipe Types</option>' + 
+        pipeTypes.map(t => `<option value="${t}">${t}</option>`).join('');
+    },
+
+    loadInventoryReport() {
+      const type = document.getElementById('report-inv-type').value;
+      const status = document.getElementById('report-inv-status').value;
+      
+      State.reportFilters.inventory = { type, status };
+      
+      // Filter inventory
+      let filteredInventory = State.inventory;
+      
+      if (type) {
+        filteredInventory = filteredInventory.filter(p => p.pipeType === type);
+      }
+      
+      // Calculate stock data
+      const stockData = filteredInventory.map(p => {
+        const assigned = Utils.cleanNum(State.assignments
+          .filter(a => a.pipeId === p.id)
+          .reduce((s, a) => s + (a.quantity || 0), 0));
+        
+        const usedInDPR = Utils.cleanNum(State.dprs.filter(d => {
+          const asgn = State.assignments.find(a => a.id === d.assignmentId);
+          return asgn && asgn.pipeId === p.id;
+        }).reduce((s, d) => s + (d.pipesUsed || 0), 0));
+        
+        const available = Utils.cleanNum((p.quantity || 0) - assigned);
+        const pct = p.quantity > 0 ? available / p.quantity : 0;
+        
+        let statusLabel = 'Normal';
+        if (pct < 0.1) statusLabel = 'Critical';
+        else if (pct < 0.25) statusLabel = 'Low';
+        
+        return {
+          ...p,
+          assigned,
+          available,
+          usedInDPR,
+          statusLabel,
+          pct
+        };
+      });
+      
+      // Filter by status
+      let filteredStock = stockData;
+      if (status) {
+        filteredStock = stockData.filter(s => {
+          if (status === 'normal') return s.statusLabel === 'Normal';
+          if (status === 'low') return s.statusLabel === 'Low';
+          if (status === 'critical') return s.statusLabel === 'Critical';
+          return true;
+        });
+      }
+      
+      // Calculate summary
+      const totalReceived = filteredStock.reduce((s, p) => s + (p.quantity || 0), 0);
+      const totalAssigned = filteredStock.reduce((s, p) => s + p.assigned, 0);
+      const totalAvailable = filteredStock.reduce((s, p) => s + p.available, 0);
+      const totalUsed = filteredStock.reduce((s, p) => s + p.usedInDPR, 0);
+      const lowStockCount = filteredStock.filter(s => s.statusLabel === 'Low' || s.statusLabel === 'Critical').length;
+      
+      // Render summary cards
+      document.getElementById('report-inv-summary').innerHTML = `
+        <div class="report-summary-card">
+          <div class="rsc-value">${filteredStock.length}</div>
+          <div class="rsc-label">Pipe Types</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value">${Utils.formatQty(totalReceived)}</div>
+          <div class="rsc-label">Total Received</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value">${Utils.formatQty(totalAvailable)}</div>
+          <div class="rsc-label">Available</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value" style="color: ${lowStockCount > 0 ? 'var(--danger-400)' : 'var(--success-400)'}">${lowStockCount}</div>
+          <div class="rsc-label">Low Stock Alerts</div>
+        </div>
+      `;
+      
+      // Render table
+      const tbody = document.getElementById('report-inv-tbody');
+      const cards = document.getElementById('report-inv-cards');
+      
+      if (!filteredStock.length) {
+        const empty = `
+          <div class="empty-state">
+            <i class="fa-solid fa-box-open"></i>
+            <h3>No inventory data</h3>
+          </div>
+        `;
+        tbody.innerHTML = `<tr><td colspan="10">${empty}</td></tr>`;
+        cards.innerHTML = empty;
+        return;
+      }
+      
+      tbody.innerHTML = filteredStock.map(p => {
+        const statusBadge = {
+          'Normal': '<span class="badge badge-success"><i class="fa-solid fa-check"></i> Normal</span>',
+          'Low': '<span class="badge badge-warning"><i class="fa-solid fa-exclamation"></i> Low</span>',
+          'Critical': '<span class="badge badge-danger"><i class="fa-solid fa-triangle-exclamation"></i> Critical</span>'
+        }[p.statusLabel];
+        
+        return `
+          <tr>
+            <td><strong>${Utils.escapeHtml(p.pipeType)}</strong></td>
+            <td class="text-mono">${p.diameter}mm</td>
+            <td>${Utils.escapeHtml(p.material || '—')}</td>
+            <td class="text-mono">${Utils.formatQty(p.quantity)}</td>
+            <td class="text-mono">${Utils.formatQty(p.assigned)}</td>
+            <td class="text-mono"><strong>${Utils.formatQty(p.available)}</strong></td>
+            <td class="text-mono">${Utils.formatQty(p.usedInDPR)}</td>
+            <td>${statusBadge}</td>
+            <td>${p.dateAdded ? Utils.formatDate(p.dateAdded) : '—'}</td>
+            <td>${Utils.escapeHtml(p.notes || '—')}</td>
+          </tr>
+        `;
+      }).join('');
+      
+      // Render mobile cards
+      cards.innerHTML = filteredStock.map(p => {
+        const statusBadge = {
+          'Normal': '<span class="badge badge-success">Normal</span>',
+          'Low': '<span class="badge badge-warning">Low</span>',
+          'Critical': '<span class="badge badge-danger">Critical</span>'
+        }[p.statusLabel];
+        
+        return `
+          <div class="data-card">
+            <div class="data-card-header">
+              <div class="data-card-title">${Utils.escapeHtml(p.pipeType)} Ø${p.diameter}mm</div>
+              ${statusBadge}
+            </div>
+            <div class="data-card-row">
+              <span class="data-card-label">Material</span>
+              <span class="data-card-value">${Utils.escapeHtml(p.material || '—')}</span>
+            </div>
+            <div class="data-card-row">
+              <span class="data-card-label">Total Received</span>
+              <span class="data-card-value text-mono">${Utils.formatQty(p.quantity)}</span>
+            </div>
+            <div class="data-card-row">
+              <span class="data-card-label">Assigned</span>
+              <span class="data-card-value text-mono">${Utils.formatQty(p.assigned)}</span>
+            </div>
+            <div class="data-card-row">
+              <span class="data-card-label">Available</span>
+              <span class="data-card-value text-mono"><strong>${Utils.formatQty(p.available)}</strong></span>
+            </div>
+            <div class="data-card-row">
+              <span class="data-card-label">Used (DPR)</span>
+              <span class="data-card-value text-mono">${Utils.formatQty(p.usedInDPR)}</span>
+            </div>
+            <div class="data-card-row">
+              <span class="data-card-label">Date Added</span>
+              <span class="data-card-value">${p.dateAdded ? Utils.formatDate(p.dateAdded) : '—'}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    },
+
+    // Professional Inventory Export
+    exportInventoryCSV() {
+      const { type, status } = State.reportFilters.inventory;
+      
+      let filteredInventory = State.inventory;
+      if (type) filteredInventory = filteredInventory.filter(p => p.pipeType === type);
+      
+      const rows = [
+        ['Stock/Inventory Report'],
+        ['Generated', new Date().toLocaleString('en-IN')],
+        ['Filter Pipe Type', type || 'All'],
+        ['Filter Status', status || 'All'],
+        [],
+        ['Pipe Type', 'Diameter (mm)', 'Material', 'Total Quantity Received', 'Total Quantity Assigned', 'Current Available Quantity', 'Used Quantity (DPR)', 'Status', 'Date Added', 'Notes']
+      ];
+      
+      filteredInventory.forEach(p => {
+        const assigned = Utils.cleanNum(State.assignments
+          .filter(a => a.pipeId === p.id)
+          .reduce((s, a) => s + (a.quantity || 0), 0));
+        
+        const usedInDPR = Utils.cleanNum(State.dprs.filter(d => {
+          const asgn = State.assignments.find(a => a.id === d.assignmentId);
+          return asgn && asgn.pipeId === p.id;
+        }).reduce((s, d) => s + (d.pipesUsed || 0), 0));
+        
+        const available = Utils.cleanNum((p.quantity || 0) - assigned);
+        const pct = p.quantity > 0 ? available / p.quantity : 0;
+        const statusLabel = pct < 0.1 ? 'Critical' : pct < 0.25 ? 'Low' : 'Normal';
+        
+        if (status && status !== statusLabel.toLowerCase()) return;
+        
+        rows.push([
+          p.pipeType,
+          p.diameter,
+          p.material || '',
+          p.quantity,
+          assigned,
+          available,
+          usedInDPR,
+          statusLabel,
+          p.dateAdded || '',
+          p.notes || ''
+        ]);
+      });
+      
+      Utils.downloadCSV(rows, Utils.generateFilename('Stock_Report'));
+      UI.toast('Exported', 'Stock report downloaded.', 'success');
+    },
+
+    // Legacy export for backward compatibility
+    exportCSV() {
+      this.exportEngineerWiseCSV();
     }
   };
 
