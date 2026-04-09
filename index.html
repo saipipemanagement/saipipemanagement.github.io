@@ -649,23 +649,65 @@
   .badge-muted { background: var(--surface-secondary); color: var(--text-tertiary); }
   .badge-primary { background: rgba(20,184,166,0.15); color: var(--primary-400); }
 
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: var(--z-modal); align-items: flex-start; justify-content: center; padding: var(--space-4); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  /* Modal - FIXED for mobile */
+  .modal-overlay { 
+    display: none; 
+    position: fixed; 
+    inset: 0; 
+    background: rgba(0,0,0,0.8); 
+    backdrop-filter: blur(4px); 
+    z-index: var(--z-modal); 
+    align-items: flex-start; 
+    justify-content: center; 
+    padding: var(--space-4); 
+    overflow-y: auto; 
+    -webkit-overflow-scrolling: touch; 
+  }
   .modal-overlay.open { display: flex; }
-  .modal { background: var(--bg-tertiary); border: 1px solid var(--border-primary); border-radius: var(--radius-xl); padding: var(--space-6); width: 100%; max-width: 560px; margin-top: 5vh; animation: modal-in 0.25s ease; box-shadow: var(--shadow-xl); }
+  .modal { 
+    background: var(--bg-tertiary); 
+    border: 1px solid var(--border-primary); 
+    border-radius: var(--radius-xl); 
+    padding: var(--space-6); 
+    width: 100%; 
+    max-width: 560px; 
+    margin-top: 5vh; 
+    animation: modal-in 0.25s ease; 
+    box-shadow: var(--shadow-xl); 
+    max-height: calc(100vh - var(--space-8)); 
+    overflow-y: auto; 
+    -webkit-overflow-scrolling: touch;
+  }
   .modal-lg { max-width: 800px; }
   .modal-xl { max-width: 1100px; }
   @keyframes modal-in { from { opacity: 0; transform: scale(0.96) translateY(-10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); position: sticky; top: 0; background: var(--bg-tertiary); z-index: 10; padding-top: var(--space-2); }
   .modal-header h3 { font-size: 18px; font-weight: 700; }
-  .modal-close { width: 36px; height: 36px; border-radius: var(--radius-md); background: var(--surface-primary); border: 1px solid var(--border-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 14px; transition: all var(--transition-fast); -webkit-tap-highlight-color: transparent; }
+  .modal-close { width: 36px; height: 36px; border-radius: var(--radius-md); background: var(--surface-primary); border: 1px solid var(--border-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 14px; transition: all var(--transition-fast); -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
   .modal-close:hover { background: var(--danger-500); color: white; border-color: var(--danger-500); }
-  .modal-footer { display: flex; gap: var(--space-3); justify-content: flex-end; margin-top: var(--space-6); padding-top: var(--space-5); border-top: 1px solid var(--border-primary); flex-wrap: wrap; }
+  .modal-footer { display: flex; gap: var(--space-3); justify-content: flex-end; margin-top: var(--space-6); padding-top: var(--space-5); border-top: 1px solid var(--border-primary); flex-wrap: wrap; position: sticky; bottom: 0; background: var(--bg-tertiary); z-index: 10; padding-bottom: var(--space-2); }
 
   .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
   .form-grid .form-group.full-width { grid-column: 1 / -1; }
-  .form-control { width: 100%; background: var(--surface-primary); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: 10px 14px; color: var(--text-primary); font-size: 14px; transition: all var(--transition-fast); -webkit-appearance: none; }
+  .form-control { 
+    width: 100%; 
+    background: var(--surface-primary); 
+    border: 1px solid var(--border-primary); 
+    border-radius: var(--radius-md); 
+    padding: 10px 14px; 
+    color: var(--text-primary); 
+    font-size: 14px; 
+    transition: all var(--transition-fast); 
+    -webkit-appearance: none; 
+  }
   .form-control:focus { border-color: var(--primary-500); background: var(--surface-secondary); box-shadow: 0 0 0 3px rgba(20,184,166,0.1); }
-  select.form-control { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+  select.form-control { 
+    cursor: pointer; 
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); 
+    background-repeat: no-repeat; 
+    background-position: right 14px center; 
+    padding-right: 36px; 
+  }
   select.form-control option { background: var(--bg-tertiary); color: var(--text-primary); }
   textarea.form-control { min-height: 80px; resize: vertical; }
   .form-hint { font-size: 12px; color: var(--text-tertiary); margin-top: var(--space-1); }
@@ -700,7 +742,15 @@
   }
 
   .eng-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-4); }
-  .eng-card { background: var(--bg-tertiary); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: var(--space-5); transition: all var(--transition-fast); cursor: pointer; }
+  .eng-card { 
+    background: var(--bg-tertiary); 
+    border: 1px solid var(--border-primary); 
+    border-radius: var(--radius-lg); 
+    padding: var(--space-5); 
+    transition: all var(--transition-fast); 
+    cursor: pointer; 
+    position: relative;
+  }
   .eng-card:hover { border-color: var(--primary-500); transform: translateY(-2px); box-shadow: var(--shadow-md); }
   .eng-card-header { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4); }
   .eng-avatar { width: 52px; height: 52px; border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--primary-700), var(--primary-500)); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: white; flex-shrink: 0; }
@@ -710,6 +760,15 @@
   .eng-stat { background: var(--surface-primary); border-radius: var(--radius-md); padding: var(--space-3); text-align: center; }
   .eng-stat .es-val { font-size: 18px; font-weight: 700; font-family: var(--font-mono); }
   .eng-stat .es-label { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; letter-spacing: 0.04em; text-transform: uppercase; }
+  
+  /* Engineer card actions - NEW */
+  .eng-card-actions {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border-primary);
+  }
 
   .notif-panel { position: fixed; top: var(--topbar-height); right: 0; width: 380px; max-width: 100%; height: calc(100vh - var(--topbar-height)); height: calc(100dvh - var(--topbar-height)); background: var(--bg-tertiary); border-left: 1px solid var(--border-primary); z-index: calc(var(--z-sticky) - 2); transform: translateX(100%); transition: transform var(--transition-base); display: flex; flex-direction: column; }
   .notif-panel.open { transform: translateX(0); }
@@ -798,6 +857,9 @@
   .w-full { width: 100%; }
   .hidden { display: none !important; }
 
+  /* =============================================
+     MOBILE RESPONSIVENESS - ENHANCED
+     ============================================= */
   @media (max-width: 1024px) {
     .stats-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
     .charts-grid { grid-template-columns: 1fr; }
@@ -823,7 +885,12 @@
     .search-wrapper { max-width: none; }
     .filter-select { width: 100%; }
     .eng-grid { grid-template-columns: 1fr; }
-    .modal { margin-top: var(--space-4); padding: var(--space-5); max-height: calc(100vh - var(--space-8)); max-height: calc(100dvh - var(--space-8)); }
+    .modal { 
+      margin-top: var(--space-2); 
+      padding: var(--space-4); 
+      max-height: calc(100vh - var(--space-4)); 
+      border-radius: var(--radius-lg);
+    }
     .form-grid { grid-template-columns: 1fr; }
     .notif-panel { width: 100%; top: var(--topbar-height); height: calc(100vh - var(--topbar-height)); height: calc(100dvh - var(--topbar-height)); }
     #toast-container { left: var(--space-4); right: var(--space-4); bottom: calc(var(--bottom-nav-height) + var(--space-4) + env(safe-area-inset-bottom, 0px)); }
@@ -831,16 +898,80 @@
     .eng-select-card { padding: var(--space-5); }
     .eng-select-grid { grid-template-columns: 1fr; }
     .report-summary-cards { grid-template-columns: repeat(2, 1fr); }
+    
+    /* Mobile tabs scrolling */
+    .tabs { 
+      width: 100%; 
+      overflow-x: auto; 
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    
+    /* Modal improvements for mobile */
+    .modal-overlay {
+      padding: var(--space-2);
+      align-items: flex-end;
+    }
+    .modal {
+      margin-top: 0;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      max-height: 90vh;
+      animation: modal-slide-up 0.25s ease;
+    }
+    @keyframes modal-slide-up { 
+      from { opacity: 0; transform: translateY(100%); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+    .modal-header {
+      position: sticky;
+      top: 0;
+      background: var(--bg-tertiary);
+      z-index: 10;
+      padding: var(--space-2) 0;
+    }
+    .modal-footer {
+      position: sticky;
+      bottom: 0;
+      background: var(--bg-tertiary);
+      z-index: 10;
+      padding: var(--space-3) 0;
+    }
+    
+    /* DPR modal specific fixes */
+    #modal-dpr .modal {
+      max-height: 95vh;
+    }
+    #modal-dpr .form-grid {
+      gap: var(--space-3);
+    }
   }
 
   @media (max-width: 480px) {
     .stats-grid { grid-template-columns: 1fr; }
     .tabs { width: 100%; }
-    .tab-btn { flex: 1; text-align: center; }
+    .tab-btn { flex: 1; text-align: center; padding: 10px 12px; }
     .modal-footer { flex-direction: column; }
     .modal-footer .btn { width: 100%; }
     .report-summary-cards { grid-template-columns: 1fr; }
+    .page-header-actions { width: 100%; }
+    .page-header-actions .btn { flex: 1; }
+    
+    /* Better touch targets */
+    .nav-item { padding: 12px var(--space-3); }
+    .bottom-nav-item { padding: var(--space-2); }
+    .icon-btn { width: 44px; height: 44px; }
+    
+    /* Engineer cards on small screens */
+    .eng-card { padding: var(--space-4); }
+    .eng-avatar { width: 44px; height: 44px; font-size: 16px; }
+    .eng-info .eng-name { font-size: 14px; }
+    .eng-stats { grid-template-columns: repeat(3, 1fr); }
+    .eng-stat { padding: var(--space-2); }
+    .eng-stat .es-val { font-size: 14px; }
+    .eng-stat .es-label { font-size: 9px; }
   }
+  
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
   }
@@ -1560,7 +1691,7 @@
         </button>
       </div>
       <div id="eng-detail-content"></div>
-      <div class="modal-footer">
+      <div class="modal-footer" id="eng-detail-footer">
         <button class="btn btn-outline" onclick="App.UI.closeModal('modal-eng-detail')">Close</button>
       </div>
     </div>
@@ -3586,7 +3717,7 @@
   };
 
   // ============================================
-  // ENGINEERS MODULE
+  // ENGINEERS MODULE - FIXED WITH EDIT/DELETE
   // ============================================
   const Engineers = {
     load() {
@@ -3601,6 +3732,7 @@
 
     renderGrid(data) {
       const grid = document.getElementById('eng-grid');
+      const isAdmin = State.currentRole === 'admin';
       
       if (!data.length) {
         grid.innerHTML = `
@@ -3623,6 +3755,18 @@
         const statusBadge = e.status === 'active' 
           ? `<span class="badge badge-success"><i class="fa-solid fa-circle" style="font-size:6px"></i> Active</span>`
           : `<span class="badge badge-muted"><i class="fa-solid fa-circle" style="font-size:6px"></i> Inactive</span>`;
+
+        // Admin actions for each engineer card
+        const adminActions = isAdmin ? `
+          <div class="eng-card-actions">
+            <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); App.Engineers.openEdit('${e.id}')">
+              <i class="fa-solid fa-edit"></i> Edit
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); App.Engineers.delete('${e.id}')">
+              <i class="fa-solid fa-trash"></i> Delete
+            </button>
+          </div>
+        ` : '';
 
         return `
           <div class="eng-card" onclick="App.Engineers.viewDetail('${e.id}')">
@@ -3648,6 +3792,7 @@
                 <div class="es-label">Stock</div>
               </div>
             </div>
+            ${adminActions}
           </div>
         `;
       }).join('');
@@ -3701,6 +3846,9 @@
       UI.openModal('modal-eng');
     },
 
+    // ============================================
+    // FIXED: save() - Added duplicate empId check
+    // ============================================
     async save() {
       const id = document.getElementById('eng-edit-id').value;
       const name = document.getElementById('eng-name').value.trim();
@@ -3709,6 +3857,22 @@
       if (!name || !empId) {
         UI.toast('Validation', 'Name and Employee ID are required.', 'warning');
         return;
+      }
+
+      // BUG FIX: Check for duplicate empId when creating new engineer
+      if (!id) {
+        const existingEmpId = State.engineers.find(e => e.empId.toLowerCase() === empId.toLowerCase());
+        if (existingEmpId) {
+          UI.toast('Duplicate Employee ID', `Employee ID "${empId}" already exists for ${existingEmpId.name}. Please use a unique Employee ID.`, 'error');
+          return;
+        }
+      } else {
+        // When editing, check if another engineer has the same empId
+        const existingEmpId = State.engineers.find(e => e.empId.toLowerCase() === empId.toLowerCase() && e.id !== id);
+        if (existingEmpId) {
+          UI.toast('Duplicate Employee ID', `Employee ID "${empId}" already exists for ${existingEmpId.name}. Please use a unique Employee ID.`, 'error');
+          return;
+        }
       }
 
       const data = {
@@ -3725,21 +3889,28 @@
 
       try {
         if (id) {
+          // Update existing engineer
           await DataService.update('engineers', id, data);
           const idx = State.engineers.findIndex(e => e.id === id);
           if (idx >= 0) State.engineers[idx] = { ...State.engineers[idx], ...data };
         } else {
+          // Create new engineer with optional auth account
           const email = document.getElementById('eng-email').value.trim();
           const password = document.getElementById('eng-password').value;
           
           if (email && password) {
+            if (password.length < 6) {
+              UI.toast('Validation', 'Password must be at least 6 characters.', 'warning');
+              UI.setButtonLoading(btn, false);
+              return;
+            }
             try {
               const userCred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
               data.userId = userCred.user.uid;
               await setDoc(doc(db, 'users', userCred.user.uid), {
                 email,
                 role: 'engineer',
-                name,
+                displayName: name,
                 createdAt: serverTimestamp()
               });
             } catch (authErr) {
@@ -3757,7 +3928,8 @@
         this.renderGrid(State.engineers);
         UI.toast('Success', id ? 'Engineer updated.' : 'Engineer added.', 'success');
       } catch (e) {
-        UI.toast('Error', e.message, 'error');
+        console.error('Engineer save error:', e);
+        UI.toast('Error', e.message || 'Failed to save engineer. Please try again.', 'error');
       } finally {
         UI.setButtonLoading(btn, false);
       }
@@ -3821,18 +3993,56 @@
         ${e.notes ? `<div><div class="form-label">Notes</div><div style="margin-top:4px;color:var(--text-secondary)">${Utils.escapeHtml(e.notes)}</div></div>` : ''}
       `;
       
+      // Add admin actions to detail modal footer
+      const footer = document.getElementById('eng-detail-footer');
+      if (State.currentRole === 'admin') {
+        footer.innerHTML = `
+          <button class="btn btn-outline" onclick="App.UI.closeModal('modal-eng-detail')">Close</button>
+          <button class="btn btn-outline" onclick="App.UI.closeModal('modal-eng-detail'); App.Engineers.openEdit('${id}')">
+            <i class="fa-solid fa-edit"></i> Edit
+          </button>
+          <button class="btn btn-danger" onclick="App.UI.closeModal('modal-eng-detail'); App.Engineers.delete('${id}')">
+            <i class="fa-solid fa-trash"></i> Delete
+          </button>
+        `;
+      } else {
+        footer.innerHTML = `<button class="btn btn-outline" onclick="App.UI.closeModal('modal-eng-detail')">Close</button>`;
+      }
+      
       UI.openModal('modal-eng-detail');
     },
 
+    // ============================================
+    // FIXED: delete() - Added dependency check
+    // ============================================
     delete(id) {
-      UI.confirm('Delete this engineer?', async () => {
+      const e = State.engineers.find(x => x.id === id);
+      if (!e) return;
+      
+      // Check for dependent data
+      const hasAssignments = State.assignments.some(a => a.engineerId === id);
+      const hasDPRs = State.dprs.some(d => d.engineerId === id);
+      const hasTargets = State.targets.some(t => t.engineerId === id);
+      
+      let warningMsg = '';
+      if (hasAssignments || hasDPRs || hasTargets) {
+        warningMsg = '\n\nWarning: This engineer has ';
+        const deps = [];
+        if (hasAssignments) deps.push('assignments');
+        if (hasDPRs) deps.push('DPRs');
+        if (hasTargets) deps.push('targets');
+        warningMsg += deps.join(', ') + '. These will remain in the system but may show "Unknown" for engineer name.';
+      }
+      
+      UI.confirm(`Are you sure you want to delete ${e.name}? This action cannot be undone.${warningMsg}`, async () => {
         try {
           await DataService.delete('engineers', id);
           State.engineers = State.engineers.filter(e => e.id !== id);
           this.renderGrid(State.engineers);
-          UI.toast('Deleted', 'Engineer removed.', 'success');
+          UI.toast('Deleted', 'Engineer removed successfully.', 'success');
         } catch (e) {
-          UI.toast('Error', e.message, 'error');
+          console.error('Delete engineer error:', e);
+          UI.toast('Error', e.message || 'Failed to delete engineer.', 'error');
         }
       });
     }
@@ -3844,7 +4054,9 @@
   const Assignments = {
     load() {
       const actEl = document.getElementById('asgn-actions');
-      if (State.currentRole === 'admin') {
+      const canCreate = State.currentRole === 'admin' || State.currentRole === 'engineer';
+      
+      if (canCreate) {
         actEl.innerHTML = `<button class="btn btn-primary" onclick="App.Assignments.openAdd()"><i class="fa-solid fa-plus"></i> Create Assignment</button>`;
       } else {
         actEl.innerHTML = '';
@@ -3882,37 +4094,39 @@
 
       tbody.innerHTML = data.map(a => {
         const pipe = State.inventory.find(p => p.id === a.pipeId);
-        const remaining = Utils.cleanNum((a.quantity || 0) - (a.assignedUsed || 0));
-        const pct = a.quantity > 0 ? remaining / a.quantity : 0;
-        const status = pct < 0.1 ? 'danger' : pct < 0.25 ? 'warning' : 'success';
-        const progressClass = status === 'danger' ? 'danger' : status === 'warning' ? 'warning' : 'success';
+        const used = Utils.cleanNum(a.assignedUsed || 0);
+        const qty = Utils.cleanNum(a.quantity || 0);
+        const rem = Utils.cleanNum(qty - used);
+        
+        const actions = canDelete ? `
+          <button class="btn btn-danger btn-sm" onclick="App.Assignments.delete('${a.id}')"><i class="fa-solid fa-trash"></i></button>
+        ` : '';
 
         return `
           <tr>
             <td><strong>${Utils.escapeHtml(DataService.getEngineerName(a.engineerId))}</strong></td>
             <td>${Utils.escapeHtml(pipe?.pipeType || '—')}</td>
             <td class="text-mono">${pipe?.diameter || '—'}mm</td>
-            <td class="text-mono">${Utils.formatQty(a.quantity)}</td>
-            <td class="text-mono">${Utils.formatQty(a.assignedUsed || 0)}</td>
-            <td class="text-mono">${Utils.formatQty(remaining)}</td>
+            <td class="text-mono">${Utils.formatQty(qty)}</td>
+            <td class="text-mono">${Utils.formatQty(used)}</td>
+            <td class="text-mono" style="color:${rem > 0 ? 'var(--success-400)' : 'var(--text-muted)'}">${Utils.formatQty(rem)}</td>
             <td>${Utils.formatDate(a.dateAssigned)}</td>
-            <td>
-              <div class="flex gap-2">
-                ${canDelete ? `<button class="btn btn-danger btn-sm" onclick="App.Assignments.delete('${a.id}')"><i class="fa-solid fa-trash"></i></button>` : ''}
-              </div>
-            </td>
+            <td><div class="flex gap-2">${actions}</div></td>
           </tr>
         `;
       }).join('');
 
       cards.innerHTML = data.map(a => {
         const pipe = State.inventory.find(p => p.id === a.pipeId);
-        const remaining = Utils.cleanNum((a.quantity || 0) - (a.assignedUsed || 0));
+        const used = Utils.cleanNum(a.assignedUsed || 0);
+        const qty = Utils.cleanNum(a.quantity || 0);
+        const rem = Utils.cleanNum(qty - used);
 
         return `
           <div class="data-card">
             <div class="data-card-header">
               <div class="data-card-title">${Utils.escapeHtml(DataService.getEngineerName(a.engineerId))}</div>
+              <span class="badge ${rem > 0 ? 'badge-success' : 'badge-muted'}">${rem} left</span>
             </div>
             <div class="data-card-row">
               <span class="data-card-label">Pipe</span>
@@ -3920,15 +4134,15 @@
             </div>
             <div class="data-card-row">
               <span class="data-card-label">Assigned</span>
-              <span class="data-card-value text-mono">${Utils.formatQty(a.quantity)}</span>
+              <span class="data-card-value text-mono">${Utils.formatQty(qty)}</span>
             </div>
             <div class="data-card-row">
               <span class="data-card-label">Used</span>
-              <span class="data-card-value text-mono">${Utils.formatQty(a.assignedUsed || 0)}</span>
+              <span class="data-card-value text-mono">${Utils.formatQty(used)}</span>
             </div>
             <div class="data-card-row">
               <span class="data-card-label">Remaining</span>
-              <span class="data-card-value text-mono">${Utils.formatQty(remaining)}</span>
+              <span class="data-card-value text-mono" style="color:${rem > 0 ? 'var(--success-400)' : 'var(--text-muted)'}">${Utils.formatQty(rem)}</span>
             </div>
             <div class="data-card-row">
               <span class="data-card-label">Date</span>
@@ -3962,28 +4176,36 @@
     openAdd() {
       const engSel = document.getElementById('asgn-engineer');
       const pipeSel = document.getElementById('asgn-pipe');
+      const hint = document.getElementById('asgn-avail-hint');
       
-      engSel.innerHTML = '<option value="">Select Engineer</option>' + 
-        State.engineers.filter(e => e.status === 'active')
-          .map(e => `<option value="${e.id}">${Utils.escapeHtml(e.name)}</option>`).join('');
-      
+      if (State.currentRole === 'engineer' && State.currentEngineer) {
+        engSel.innerHTML = `<option value="${State.currentEngineer.id}">${Utils.escapeHtml(State.currentEngineer.name)}</option>`;
+        engSel.disabled = true;
+      } else {
+        engSel.disabled = false;
+        engSel.innerHTML = '<option value="">Select Engineer</option>' + 
+          State.engineers.filter(e => e.status === 'active')
+            .map(e => `<option value="${e.id}">${Utils.escapeHtml(e.name)}</option>`).join('');
+      }
+
+      const availablePipes = State.inventory.filter(p => DataService.getAvailableQty(p.id) > 0);
       pipeSel.innerHTML = '<option value="">Select Pipe</option>' + 
-        State.inventory.map(p => {
+        availablePipes.map(p => {
           const avail = DataService.getAvailableQty(p.id);
-          return `<option value="${p.id}" data-avail="${avail}">${Utils.escapeHtml(p.pipeType)} Ø${p.diameter}mm (${avail} avail)</option>`;
+          return `<option value="${p.id}">${Utils.escapeHtml(p.pipeType)} Ø${p.diameter}mm — ${avail} avail</option>`;
         }).join('');
-      
+
       pipeSel.onchange = () => {
-        const opt = pipeSel.options[pipeSel.selectedIndex];
-        const avail = opt.dataset.avail || 0;
-        document.getElementById('asgn-avail-hint').textContent = `Available: ${Utils.formatQty(avail)}`;
+        const pipeId = pipeSel.value;
+        const avail = pipeId ? DataService.getAvailableQty(pipeId) : 0;
+        hint.textContent = pipeId ? `Available: ${avail}` : '';
+        hint.style.color = avail > 0 ? 'var(--success-400)' : 'var(--danger-400)';
       };
 
-      document.getElementById('asgn-modal-title').textContent = 'Create Assignment';
       document.getElementById('asgn-edit-id').value = '';
       document.getElementById('asgn-quantity').value = '';
       document.getElementById('asgn-notes').value = '';
-      document.getElementById('asgn-avail-hint').textContent = '';
+      hint.textContent = '';
       
       UI.openModal('modal-asgn');
     },
@@ -3994,7 +4216,7 @@
       const qty = Utils.cleanNum(document.getElementById('asgn-quantity').value);
       
       if (!engineerId || !pipeId || qty <= 0) {
-        UI.toast('Validation', 'Please fill all fields with valid values.', 'warning');
+        UI.toast('Validation', 'Please fill all required fields with valid values.', 'warning');
         return;
       }
 
@@ -4030,7 +4252,7 @@
     },
 
     delete(id) {
-      UI.confirm('Delete this assignment?', async () => {
+      UI.confirm('Delete this assignment? This will reverse the pipe allocation.', async () => {
         try {
           await DataService.delete('assignments', id);
           State.assignments = State.assignments.filter(a => a.id !== id);
@@ -4042,53 +4264,55 @@
       });
     },
 
-    // Professional Assignment Export
     exportCSV() {
       const rows = [
-        ['Engineer Name', 'Pipe Type', 'Diameter (mm)', 'Material', 'Quantity Assigned', 'Quantity Used', 'Quantity Remaining', 'Date Assigned', 'Notes']
+        ['Engineer', 'Pipe Type', 'Diameter (mm)', 'Material', 'Quantity Assigned', 'Quantity Used', 'Quantity Remaining', 'Date Assigned', 'Notes']
       ];
       
       State.assignments.forEach(a => {
         const pipe = State.inventory.find(p => p.id === a.pipeId);
-        const remaining = Utils.cleanNum((a.quantity || 0) - (a.assignedUsed || 0));
+        const used = Utils.cleanNum(a.assignedUsed || 0);
+        const qty = Utils.cleanNum(a.quantity || 0);
+        const rem = Utils.cleanNum(qty - used);
         
         rows.push([
           DataService.getEngineerName(a.engineerId),
           pipe?.pipeType || '',
           pipe?.diameter || '',
           pipe?.material || '',
-          a.quantity,
-          a.assignedUsed || 0,
-          remaining,
+          qty,
+          used,
+          rem,
           a.dateAssigned || '',
           a.notes || ''
         ]);
       });
       
-      Utils.downloadCSV(rows, Utils.generateFilename('Assignment_Report'));
-      UI.toast('Exported', 'Assignment report downloaded.', 'success');
+      Utils.downloadCSV(rows, Utils.generateFilename('Assignments_Report'));
+      UI.toast('Exported', 'Assignments report downloaded.', 'success');
     }
   };
 
   // ============================================
-  // TARGETS MODULE - FIXED (removed duplicate openAdd)
+  // TARGETS MODULE
   // ============================================
   const Targets = {
     load() {
       const actEl = document.getElementById('tgt-actions');
-      if (State.currentRole === 'admin') {
+      const canSet = State.currentRole === 'admin' || State.currentRole === 'engineer';
+      
+      if (canSet) {
         actEl.innerHTML = `<button class="btn btn-primary" onclick="App.Targets.openAdd()"><i class="fa-solid fa-plus"></i> Set Target</button>`;
       } else {
         actEl.innerHTML = '';
       }
 
-      const mf = document.getElementById('tgt-filter-month');
-      const ef = document.getElementById('tgt-filter-eng');
-      
       const months = [...new Set(State.targets.map(t => t.month).filter(Boolean))];
+      const mf = document.getElementById('tgt-filter-month');
       mf.innerHTML = '<option value="">All Months</option>' + 
         months.sort().reverse().map(m => `<option value="${m}">${Utils.formatMonth(m)}</option>`).join('');
-      
+
+      const ef = document.getElementById('tgt-filter-eng');
       ef.innerHTML = '<option value="">All Engineers</option>' + 
         State.engineers.map(e => `<option value="${e.id}">${Utils.escapeHtml(e.name)}</option>`).join('');
 
@@ -4109,7 +4333,7 @@
         const empty = `
           <div class="empty-state">
             <i class="fa-solid fa-bullseye"></i>
-            <h3>No targets</h3>
+            <h3>No targets set</h3>
             <p>Set monthly targets for engineers</p>
           </div>
         `;
@@ -4119,71 +4343,75 @@
       }
 
       tbody.innerHTML = data.map(t => {
-        const achieved = this.getAchieved(t.engineerId, t.month);
-        const pct = t.targetMeters > 0 ? achieved.meters / t.targetMeters : 0;
-        const progressClass = pct < 0.5 ? 'danger' : pct < 0.75 ? 'warning' : 'success';
+        const myDprs = State.dprs.filter(d => d.engineerId === t.engineerId && (d.date || '').startsWith(t.month));
+        const achieved = Utils.cleanNum(myDprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
+        const target = Utils.cleanNum(t.targetMeters || 0);
+        const pct = target > 0 ? Math.min(100, (achieved / target) * 100) : 0;
+        const status = pct >= 100 ? 'success' : pct >= 50 ? 'warning' : 'danger';
+        
+        const actions = canDelete ? `
+          <button class="btn btn-danger btn-sm" onclick="App.Targets.delete('${t.id}')"><i class="fa-solid fa-trash"></i></button>
+        ` : '';
 
         return `
           <tr>
             <td><strong>${Utils.escapeHtml(DataService.getEngineerName(t.engineerId))}</strong></td>
             <td>${Utils.formatMonth(t.month)}</td>
-            <td class="text-mono">${Utils.cleanNum(t.targetMeters || 0).toFixed(1)}m</td>
-            <td class="text-mono">${Utils.formatQty(t.targetPipes)}</td>
-            <td class="text-mono" style="color:var(--primary-400)">${achieved.meters.toFixed(1)}m</td>
+            <td class="text-mono">${target.toFixed(1)}m</td>
+            <td class="text-mono">${Utils.cleanNum(t.targetPipes || 0).toFixed(0)}</td>
+            <td class="text-mono" style="color:${status === 'success' ? 'var(--success-400)' : status === 'warning' ? 'var(--warning-400)' : 'var(--danger-400)'}">${achieved.toFixed(1)}m</td>
             <td>
               <div class="progress-wrapper">
-                <div class="progress-bar ${progressClass}" style="width: ${Math.min(pct * 100, 100)}%"></div>
+                <div class="progress-bar ${status}" style="width: ${pct}%"></div>
               </div>
-              <div style="font-size: 11px; margin-top: 4px; color: var(--text-tertiary);">${(pct * 100).toFixed(0)}%</div>
+              <div style="font-size: 11px; margin-top: 4px; color: var(--text-tertiary);">${pct.toFixed(0)}%</div>
             </td>
-            <td>
-              <div class="flex gap-2">
-                ${canDelete ? `<button class="btn btn-danger btn-sm" onclick="App.Targets.delete('${t.id}')"><i class="fa-solid fa-trash"></i></button>` : ''}
-              </div>
-            </td>
+            <td><div class="flex gap-2">${actions}</div></td>
           </tr>
         `;
       }).join('');
 
       cards.innerHTML = data.map(t => {
-        const achieved = this.getAchieved(t.engineerId, t.month);
-        const pct = t.targetMeters > 0 ? achieved.meters / t.targetMeters : 0;
+        const myDprs = State.dprs.filter(d => d.engineerId === t.engineerId && (d.date || '').startsWith(t.month));
+        const achieved = Utils.cleanNum(myDprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
+        const target = Utils.cleanNum(t.targetMeters || 0);
+        const pct = target > 0 ? Math.min(100, (achieved / target) * 100) : 0;
+        const status = pct >= 100 ? 'success' : pct >= 50 ? 'warning' : 'danger';
 
         return `
           <div class="data-card">
             <div class="data-card-header">
               <div class="data-card-title">${Utils.escapeHtml(DataService.getEngineerName(t.engineerId))}</div>
-              <span class="badge badge-primary">${Utils.formatMonth(t.month)}</span>
+              <span class="badge badge-${status}">${pct.toFixed(0)}%</span>
+            </div>
+            <div class="data-card-row">
+              <span class="data-card-label">Month</span>
+              <span class="data-card-value">${Utils.formatMonth(t.month)}</span>
             </div>
             <div class="data-card-row">
               <span class="data-card-label">Target Meters</span>
-              <span class="data-card-value text-mono">${Utils.cleanNum(t.targetMeters || 0).toFixed(1)}m</span>
+              <span class="data-card-value text-mono">${target.toFixed(1)}m</span>
             </div>
             <div class="data-card-row">
               <span class="data-card-label">Target Pipes</span>
-              <span class="data-card-value text-mono">${Utils.formatQty(t.targetPipes)}</span>
+              <span class="data-card-value text-mono">${Utils.cleanNum(t.targetPipes || 0).toFixed(0)}</span>
             </div>
             <div class="data-card-row">
               <span class="data-card-label">Achieved</span>
-              <span class="data-card-value text-mono" style="color:var(--primary-400)">${achieved.meters.toFixed(1)}m</span>
+              <span class="data-card-value text-mono" style="color:${status === 'success' ? 'var(--success-400)' : status === 'warning' ? 'var(--warning-400)' : 'var(--danger-400)'}">${achieved.toFixed(1)}m</span>
             </div>
             <div class="data-card-row">
               <span class="data-card-label">Progress</span>
-              <span class="data-card-value">${(pct * 100).toFixed(0)}%</span>
+              <span class="data-card-value">
+                <div class="progress-wrapper" style="width: 100px; display: inline-block; vertical-align: middle;">
+                  <div class="progress-bar ${status}" style="width: ${pct}%"></div>
+                </div>
+              </span>
             </div>
             ${canDelete ? `<div class="data-card-actions"><button class="btn btn-danger btn-sm" onclick="App.Targets.delete('${t.id}')">Delete</button></div>` : ''}
           </div>
         `;
       }).join('');
-    },
-
-    getAchieved(engineerId, month) {
-      const dprs = State.dprs.filter(d => d.engineerId === engineerId && (d.date || '').startsWith(month));
-      return {
-        meters: Utils.cleanNum(dprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0)),
-        pipes: Utils.cleanNum(dprs.reduce((s, d) => s + (d.pipesUsed || 0), 0)),
-        count: dprs.length
-      };
     },
 
     filter: Utils.debounce(function() {
@@ -4206,11 +4434,17 @@
 
     openAdd() {
       const engSel = document.getElementById('tgt-engineer');
-      engSel.innerHTML = '<option value="">Select Engineer</option>' + 
-        State.engineers.filter(e => e.status === 'active')
-          .map(e => `<option value="${e.id}">${Utils.escapeHtml(e.name)}</option>`).join('');
       
-      document.getElementById('tgt-modal-title').textContent = 'Set Target';
+      if (State.currentRole === 'engineer' && State.currentEngineer) {
+        engSel.innerHTML = `<option value="${State.currentEngineer.id}">${Utils.escapeHtml(State.currentEngineer.name)}</option>`;
+        engSel.disabled = true;
+      } else {
+        engSel.disabled = false;
+        engSel.innerHTML = '<option value="">Select Engineer</option>' + 
+          State.engineers.filter(e => e.status === 'active')
+            .map(e => `<option value="${e.id}">${Utils.escapeHtml(e.name)}</option>`).join('');
+      }
+
       document.getElementById('tgt-edit-id').value = '';
       document.getElementById('tgt-month').value = Utils.currentMonth();
       document.getElementById('tgt-meters').value = '';
@@ -4222,34 +4456,25 @@
     async save() {
       const engineerId = document.getElementById('tgt-engineer').value;
       const month = document.getElementById('tgt-month').value;
-      const meters = Utils.cleanNum(document.getElementById('tgt-meters').value);
-      const pipes = Utils.cleanNum(document.getElementById('tgt-pipes').value);
+      const targetMeters = Utils.cleanNum(document.getElementById('tgt-meters').value);
+      const targetPipes = Utils.cleanNum(document.getElementById('tgt-pipes').value);
       
-      if (!engineerId || !month || meters <= 0 || pipes <= 0) {
-        UI.toast('Validation', 'Please fill all fields with valid values.', 'warning');
+      if (!engineerId || !month || targetMeters < 0 || targetPipes < 0) {
+        UI.toast('Validation', 'Please fill all required fields with valid values.', 'warning');
         return;
       }
 
-      const data = { engineerId, month, targetMeters: meters, targetPipes: pipes };
+      const data = { engineerId, month, targetMeters, targetPipes };
 
       const btn = document.getElementById('btn-save-tgt');
       UI.setButtonLoading(btn, true);
 
       try {
-        const existing = State.targets.find(t => t.engineerId === engineerId && t.month === month);
-        if (existing) {
-          await DataService.update('targets', existing.id, data);
-          const idx = State.targets.findIndex(t => t.id === existing.id);
-          if (idx >= 0) State.targets[idx] = { ...State.targets[idx], ...data };
-          UI.toast('Updated', 'Target updated.', 'success');
-        } else {
-          const docRef = await DataService.add('targets', data);
-          State.targets.unshift({ id: docRef.id, ...data });
-          UI.toast('Success', 'Target set.', 'success');
-        }
-        
+        const docRef = await DataService.add('targets', data);
+        State.targets.unshift({ id: docRef.id, ...data });
         UI.closeModal('modal-tgt');
         this.renderTable(State.targets);
+        UI.toast('Success', 'Target set.', 'success');
       } catch (e) {
         UI.toast('Error', e.message, 'error');
       } finally {
@@ -4272,123 +4497,108 @@
   };
 
   // ============================================
-  // REPORTS MODULE - ENHANCED WITH PROFESSIONAL EXPORTS
+  // REPORTS MODULE - FIXED WITH PROPER FILTERS
   // ============================================
   const Reports = {
+    currentTab: 'overview',
+
     load() {
-      this.populateFilters();
+      this.populateReportFilters();
       this.loadOverview();
     },
 
-    switchTab(tab, btn) {
-      document.querySelectorAll('#report-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('#report-tab-overview, #report-tab-monthwise, #report-tab-engineerwise, #report-tab-inventory').forEach(t => t.classList.remove('active'));
-      
-      btn.classList.add('active');
-      document.getElementById(`report-tab-${tab}`).classList.add('active');
-      
-      if (tab === 'monthwise') this.loadMonthWise();
-      else if (tab === 'engineerwise') this.loadEngineerWise();
-      else if (tab === 'inventory') this.loadInventoryReport();
-      else if (tab === 'overview') this.loadOverview();
-    },
-
-    populateFilters() {
-      // Month-wise filters
-      const months = [...new Set(State.dprs.map(d => (d.date || '').slice(0, 7)).filter(Boolean))];
-      const pipes = [...new Set(State.inventory.map(p => p.pipeType).filter(Boolean))];
-      
+    populateReportFilters() {
+      // Month-wise report filters
       const mwMonth = document.getElementById('report-mw-month');
+      const months = Utils.getAllMonths();
       mwMonth.innerHTML = '<option value="">Select Month</option>' + 
-        months.sort().reverse().map(m => `<option value="${m}">${Utils.formatMonth(m)}</option>`).join('');
+        months.map(m => `<option value="${m}">${Utils.formatMonth(m)}</option>`).join('');
       
       const mwEng = document.getElementById('report-mw-engineer');
       mwEng.innerHTML = '<option value="">All Engineers</option>' + 
         State.engineers.map(e => `<option value="${e.id}">${Utils.escapeHtml(e.name)}</option>`).join('');
       
       const mwPipe = document.getElementById('report-mw-pipe');
+      const pipeTypes = [...new Set(State.inventory.map(p => p.pipeType))].filter(Boolean);
       mwPipe.innerHTML = '<option value="">All Pipe Types</option>' + 
-        pipes.map(p => `<option value="${p}">${p}</option>`).join('');
+        pipeTypes.map(t => `<option value="${t}">${t}</option>`).join('');
 
-      // Engineer-wise filters
+      // Engineer-wise report filters
       const ewEng = document.getElementById('report-ew-engineer');
       ewEng.innerHTML = '<option value="">All Engineers</option>' + 
         State.engineers.map(e => `<option value="${e.id}">${Utils.escapeHtml(e.name)}</option>`).join('');
       
       const ewMonth = document.getElementById('report-ew-month');
       ewMonth.innerHTML = '<option value="">All Months</option>' + 
-        months.sort().reverse().map(m => `<option value="${m}">${Utils.formatMonth(m)}</option>`).join('');
+        months.map(m => `<option value="${m}">${Utils.formatMonth(m)}</option>`).join('');
 
-      // Inventory filters
+      // Inventory report filters
       const invType = document.getElementById('report-inv-type');
       invType.innerHTML = '<option value="">All Pipe Types</option>' + 
-        pipes.map(p => `<option value="${p}">${p}</option>`).join('');
+        pipeTypes.map(t => `<option value="${t}">${t}</option>`).join('');
+    },
+
+    switchTab(tab, btn) {
+      this.currentTab = tab;
+      
+      document.querySelectorAll('#report-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#page-reports .tab-content').forEach(t => t.classList.remove('active'));
+      
+      btn.classList.add('active');
+      document.getElementById(`report-tab-${tab}`).classList.add('active');
+      
+      if (tab === 'overview') this.loadOverview();
+      else if (tab === 'monthwise') this.loadMonthWise();
+      else if (tab === 'engineerwise') this.loadEngineerWise();
+      else if (tab === 'inventory') this.loadInventoryReport();
     },
 
     loadOverview() {
-      // Stats
-      const totalMeters = Utils.cleanNum(State.dprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
-      const totalPipes = Utils.cleanNum(State.dprs.reduce((s, d) => s + (d.pipesUsed || 0), 0));
-      const totalDprs = State.dprs.length;
-      const avgMeters = totalDprs > 0 ? totalMeters / totalDprs : 0;
-
+      const { inv, asgn, dprs } = this.getReportData();
+      
+      const totalProcured = Utils.cleanNum(inv.reduce((s, p) => s + (p.quantity || 0), 0));
+      const totalAssigned = Utils.cleanNum(asgn.reduce((s, a) => s + (a.quantity || 0), 0));
+      const warehouseStock = Utils.cleanNum(totalProcured - totalAssigned);
+      const totalUsed = Utils.cleanNum(dprs.reduce((s, d) => s + (d.pipesUsed || 0), 0));
+      const totalMeters = Utils.cleanNum(dprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
+      const totalJoints = Utils.cleanNum(dprs.reduce((s, d) => s + (d.totalJoints || 0), 0));
+      
       document.getElementById('report-overview-stats').innerHTML = `
-        ${Dashboard.statCard('Total DPRs', totalDprs, 'fa-file-lines', 'rgba(20,184,166,0.15)', 'Submitted reports')}
-        ${Dashboard.statCard('Total Meters', totalMeters.toFixed(1) + 'm', 'fa-ruler', 'rgba(59,130,246,0.15)', 'Cumulative')}
-        ${Dashboard.statCard('Total Pipes', Utils.formatQty(totalPipes), 'fa-layer-group', 'rgba(34,197,94,0.15)', 'Used')}
-        ${Dashboard.statCard('Avg Meters/DPR', avgMeters.toFixed(1) + 'm', 'fa-chart-line', 'rgba(245,158,11,0.15)', 'Per report')}
+        ${this.statCard('Total Inventory Types', inv.length, 'fa-boxes-stacked', 'rgba(20,184,166,0.15)')}
+        ${this.statCard('Warehouse Stock', Utils.formatQty(warehouseStock), 'fa-layer-group', 'rgba(59,130,246,0.15)')}
+        ${this.statCard('Issued to Field', Utils.formatQty(totalAssigned), 'fa-truck-fast', 'rgba(34,197,94,0.15)')}
+        ${this.statCard('Total Pipes Used', Utils.formatQty(totalUsed), 'fa-layer-group', 'rgba(168,85,247,0.15)')}
+        ${this.statCard('Total Meters Laid', totalMeters.toFixed(1) + 'm', 'fa-ruler', 'rgba(245,158,11,0.15)')}
+        ${this.statCard('Total Joints', Utils.formatQty(totalJoints), 'fa-circle-nodes', 'rgba(6,182,212,0.15)')}
       `;
 
-      // Engineer summary table
-      const tbody = document.getElementById('report-overview-eng-tbody');
-      const cards = document.getElementById('report-overview-eng-cards');
-      
-      const engData = State.engineers.map(e => {
-        const dprs = State.dprs.filter(d => d.engineerId === e.id);
-        return {
-          ...e,
-          dprs: dprs.length,
-          pipes: Utils.cleanNum(dprs.reduce((s, d) => s + (d.pipesUsed || 0), 0)),
-          meters: Utils.cleanNum(dprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0)),
-          joints: Utils.cleanNum(dprs.reduce((s, d) => s + (d.totalJoints || 0), 0))
-        };
-      }).sort((a, b) => b.meters - a.meters);
+      this.renderOverviewCharts();
+      this.renderOverviewEngTable();
+    },
 
-      tbody.innerHTML = engData.map(e => `
-        <tr>
-          <td><strong>${Utils.escapeHtml(e.name)}</strong></td>
-          <td class="text-mono">${e.dprs}</td>
-          <td class="text-mono">${Utils.formatQty(e.pipes)}</td>
-          <td class="text-mono">${e.meters.toFixed(1)}m</td>
-          <td class="text-mono">${Utils.formatQty(e.joints)}</td>
-        </tr>
-      `).join('');
+    getReportData() {
+      return {
+        inv: State.inventory,
+        asgn: State.assignments,
+        dprs: State.dprs,
+        targets: State.targets,
+        engineers: State.engineers
+      };
+    },
 
-      cards.innerHTML = engData.map(e => `
-        <div class="data-card">
-          <div class="data-card-header">
-            <div class="data-card-title">${Utils.escapeHtml(e.name)}</div>
+    statCard(label, value, icon, bg) {
+      return `
+        <div class="stat-card">
+          <div class="sc-icon" style="background: ${bg}">
+            <i class="fa-solid ${icon}" style="color: var(--primary-400)"></i>
           </div>
-          <div class="data-card-row">
-            <span class="data-card-label">DPRs</span>
-            <span class="data-card-value text-mono">${e.dprs}</span>
-          </div>
-          <div class="data-card-row">
-            <span class="data-card-label">Pipes</span>
-            <span class="data-card-value text-mono">${Utils.formatQty(e.pipes)}</span>
-          </div>
-          <div class="data-card-row">
-            <span class="data-card-label">Meters</span>
-            <span class="data-card-value text-mono">${e.meters.toFixed(1)}m</span>
-          </div>
-          <div class="data-card-row">
-            <span class="data-card-label">Joints</span>
-            <span class="data-card-value text-mono">${Utils.formatQty(e.joints)}</span>
-          </div>
+          <div class="sc-label">${label}</div>
+          <div class="sc-value">${value}</div>
         </div>
-      `).join('');
+      `;
+    },
 
-      // Charts
+    renderOverviewCharts() {
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       const textColor = isDark ? '#94a3b8' : '#475569';
       const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
@@ -4409,9 +4619,9 @@
             data: monthlyData,
             borderColor: 'rgba(20,184,166,1)',
             backgroundColor: 'rgba(20,184,166,0.1)',
-            borderWidth: 2,
             fill: true,
-            tension: 0.4
+            tension: 0.4,
+            borderWidth: 2
           }]
         },
         options: {
@@ -4425,19 +4635,25 @@
         }
       });
 
-      const topEng = engData.slice(0, 8);
+      const engData = State.engineers.slice(0, 8).map(e => {
+        const meters = Utils.cleanNum(State.dprs
+          .filter(d => d.engineerId === e.id)
+          .reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
+        return { name: e.name, meters };
+      }).sort((a, b) => b.meters - a.meters);
+
       if (State.charts.reportEng) State.charts.reportEng.destroy();
       State.charts.reportEng = new Chart(document.getElementById('chart-report-eng'), {
         type: 'bar',
         data: {
-          labels: topEng.map(e => e.name.split(' ')[0]),
+          labels: engData.map(d => d.name.split(' ')[0]),
           datasets: [{
             label: 'Meters',
-            data: topEng.map(e => e.meters),
+            data: engData.map(d => d.meters),
             backgroundColor: 'rgba(59,130,246,0.7)',
             borderColor: 'rgba(59,130,246,1)',
             borderWidth: 1,
-            borderRadius: 6
+            borderRadius: 4
           }]
         },
         options: {
@@ -4452,50 +4668,112 @@
       });
     },
 
+    renderOverviewEngTable() {
+      const tbody = document.getElementById('report-overview-eng-tbody');
+      const cards = document.getElementById('report-overview-eng-cards');
+      
+      const data = State.engineers.map(e => {
+        const myDprs = State.dprs.filter(d => d.engineerId === e.id);
+        return {
+          name: e.name,
+          dprs: myDprs.length,
+          pipes: Utils.cleanNum(myDprs.reduce((s, d) => s + (d.pipesUsed || 0), 0)),
+          meters: Utils.cleanNum(myDprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0)),
+          joints: Utils.cleanNum(myDprs.reduce((s, d) => s + (d.totalJoints || 0), 0))
+        };
+      }).sort((a, b) => b.meters - a.meters);
+
+      tbody.innerHTML = data.map(d => `
+        <tr>
+          <td><strong>${Utils.escapeHtml(d.name)}</strong></td>
+          <td class="text-mono">${d.dprs}</td>
+          <td class="text-mono">${Utils.formatQty(d.pipes)}</td>
+          <td class="text-mono">${d.meters.toFixed(1)}m</td>
+          <td class="text-mono">${Utils.formatQty(d.joints)}</td>
+        </tr>
+      `).join('');
+
+      cards.innerHTML = data.map(d => `
+        <div class="data-card">
+          <div class="data-card-header">
+            <div class="data-card-title">${Utils.escapeHtml(d.name)}</div>
+          </div>
+          <div class="data-card-row">
+            <span class="data-card-label">DPRs</span>
+            <span class="data-card-value text-mono">${d.dprs}</span>
+          </div>
+          <div class="data-card-row">
+            <span class="data-card-label">Pipes</span>
+            <span class="data-card-value text-mono">${Utils.formatQty(d.pipes)}</span>
+          </div>
+          <div class="data-card-row">
+            <span class="data-card-label">Meters</span>
+            <span class="data-card-value text-mono">${d.meters.toFixed(1)}m</span>
+          </div>
+          <div class="data-card-row">
+            <span class="data-card-label">Joints</span>
+            <span class="data-card-value text-mono">${Utils.formatQty(d.joints)}</span>
+          </div>
+        </div>
+      `).join('');
+    },
+
+    // ============================================
+    // FIXED: loadMonthWise() - Uses current filter values
+    // ============================================
     loadMonthWise() {
       const month = document.getElementById('report-mw-month').value;
-      const eng = document.getElementById('report-mw-engineer').value;
+      const engineer = document.getElementById('report-mw-engineer').value;
       const pipe = document.getElementById('report-mw-pipe').value;
       
+      // Save to state for export consistency
+      State.reportFilters.monthWise = { month, engineer, pipe };
+      
       let data = State.dprs;
-      if (month) data = data.filter(d => (d.date || '').startsWith(month));
-      if (eng) data = data.filter(d => d.engineerId === eng);
+      
+      // Apply filters
+      if (month) data = data.filter(d => d.date && d.date.startsWith(month));
+      if (engineer) data = data.filter(d => d.engineerId === engineer);
       if (pipe) data = data.filter(d => d.pipeType === pipe);
-
-      // Summary
-      const totalMeters = Utils.cleanNum(data.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
+      
+      // Calculate summary
       const totalPipes = Utils.cleanNum(data.reduce((s, d) => s + (d.pipesUsed || 0), 0));
+      const totalMeters = Utils.cleanNum(data.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
       const totalJoints = Utils.cleanNum(data.reduce((s, d) => s + (d.totalJoints || 0), 0));
-
+      const uniqueEngineers = [...new Set(data.map(d => d.engineerId))].length;
+      
       document.getElementById('report-mw-summary').innerHTML = `
         <div class="report-summary-card">
           <div class="rsc-value">${data.length}</div>
           <div class="rsc-label">Total DPRs</div>
         </div>
         <div class="report-summary-card">
-          <div class="rsc-value">${totalMeters.toFixed(1)}m</div>
-          <div class="rsc-label">Total Meters</div>
+          <div class="rsc-value">${uniqueEngineers}</div>
+          <div class="rsc-label">Engineers</div>
         </div>
         <div class="report-summary-card">
           <div class="rsc-value">${Utils.formatQty(totalPipes)}</div>
-          <div class="rsc-label">Total Pipes</div>
+          <div class="rsc-label">Pipes Used</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value">${totalMeters.toFixed(1)}m</div>
+          <div class="rsc-label">Meters Laid</div>
         </div>
         <div class="report-summary-card">
           <div class="rsc-value">${Utils.formatQty(totalJoints)}</div>
-          <div class="rsc-label">Total Joints</div>
+          <div class="rsc-label">Joints</div>
         </div>
       `;
 
-      // Table
       const tbody = document.getElementById('report-mw-tbody');
       const cards = document.getElementById('report-mw-cards');
       
       if (!data.length) {
         const empty = `
           <div class="empty-state">
-            <i class="fa-solid fa-calendar-days"></i>
+            <i class="fa-solid fa-calendar-xmark"></i>
             <h3>No data found</h3>
-            <p>Try adjusting the filters</p>
+            <p>Try adjusting your filters</p>
           </div>
         `;
         tbody.innerHTML = `<tr><td colspan="11">${empty}</td></tr>`;
@@ -4510,16 +4788,16 @@
         return `
           <tr>
             <td>${Utils.formatDate(d.date)}</td>
-            <td>${Utils.escapeHtml(DataService.getEngineerName(d.engineerId))}</td>
+            <td><strong>${Utils.escapeHtml(DataService.getEngineerName(d.engineerId))}</strong></td>
             <td>${Utils.escapeHtml(d.pipeType || '—')}</td>
             <td class="text-mono">${d.diameter || '—'}mm</td>
-            <td>${Utils.escapeHtml(pipe?.material || '—')}</td>
+            <td>${pipe?.material || '—'}</td>
             <td class="text-mono">${Utils.formatQty(d.pipesUsed)}</td>
             <td class="text-mono">${Utils.cleanNum(d.meterLaid || 0).toFixed(1)}m</td>
             <td class="text-mono">${Utils.formatQty(d.totalJoints)}</td>
-            <td>${Utils.escapeHtml(d.startJunction || '—')}</td>
-            <td>${Utils.escapeHtml(d.endJunction || '—')}</td>
-            <td>${Utils.escapeHtml(d.notes || '—')}</td>
+            <td>${d.startJunction || '—'}</td>
+            <td>${d.endJunction || '—'}</td>
+            <td>${d.notes || '—'}</td>
           </tr>
         `;
       }).join('');
@@ -4536,7 +4814,7 @@
           </div>
           <div class="data-card-row">
             <span class="data-card-label">Pipe</span>
-            <span class="data-card-value">${Utils.escapeHtml(d.pipeType || '—')}</span>
+            <span class="data-card-value">${Utils.escapeHtml(d.pipeType || '—')} Ø${d.diameter || '—'}mm</span>
           </div>
           <div class="data-card-row">
             <span class="data-card-label">Pipes Used</span>
@@ -4550,74 +4828,150 @@
       `).join('');
     },
 
+    exportMonthWiseCSV() {
+      const { month, engineer, pipe } = State.reportFilters.monthWise;
+      
+      let data = State.dprs;
+      if (month) data = data.filter(d => d.date && d.date.startsWith(month));
+      if (engineer) data = data.filter(d => d.engineerId === engineer);
+      if (pipe) data = data.filter(d => d.pipeType === pipe);
+      
+      const rows = [
+        ['Date', 'Engineer Name', 'Pipe Type', 'Diameter (mm)', 'Material', 'Pipes Used', 'Meters Laid', 'Total Joints', 'Start Junction', 'End Junction', 'Notes']
+      ];
+      
+      data.forEach(d => {
+        const asgn = State.assignments.find(a => a.id === d.assignmentId);
+        const p = asgn ? State.inventory.find(x => x.id === asgn.pipeId) : null;
+        
+        rows.push([
+          d.date,
+          DataService.getEngineerName(d.engineerId),
+          d.pipeType || '',
+          d.diameter || '',
+          p?.material || '',
+          d.pipesUsed,
+          Utils.cleanNum(d.meterLaid || 0).toFixed(2),
+          d.totalJoints || 0,
+          d.startJunction || '',
+          d.endJunction || '',
+          d.notes || ''
+        ]);
+      });
+      
+      Utils.downloadCSV(rows, Utils.generateFilename('MonthWise_Report'));
+      UI.toast('Exported', 'Month-wise report downloaded.', 'success');
+    },
+
+    // ============================================
+    // FIXED: loadEngineerWise() - Uses current filter values
+    // ============================================
     loadEngineerWise() {
-      const eng = document.getElementById('report-ew-engineer').value;
+      const engineer = document.getElementById('report-ew-engineer').value;
       const month = document.getElementById('report-ew-month').value;
       
-      // Filter data
-      let dprs = State.dprs;
-      if (eng) dprs = dprs.filter(d => d.engineerId === eng);
-      if (month) dprs = dprs.filter(d => (d.date || '').startsWith(month));
-
-      // Engineer performance
-      const engData = State.engineers.map(e => {
-        const eDprs = dprs.filter(d => d.engineerId === e.id);
-        return {
-          ...e,
-          dprs: eDprs.length,
-          pipes: Utils.cleanNum(eDprs.reduce((s, d) => s + (d.pipesUsed || 0), 0)),
-          meters: Utils.cleanNum(eDprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0)),
-          joints: Utils.cleanNum(eDprs.reduce((s, d) => s + (d.totalJoints || 0), 0)),
-          avgMeters: eDprs.length > 0 ? Utils.cleanNum(eDprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0)) / eDprs.length : 0
-        };
-      }).filter(e => e.dprs > 0).sort((a, b) => b.meters - a.meters);
-
-      // Summary
-      const totalMeters = Utils.cleanNum(engData.reduce((s, e) => s + e.meters, 0));
-      const totalPipes = Utils.cleanNum(engData.reduce((s, e) => s + e.pipes, 0));
-      const totalDprs = engData.reduce((s, e) => s + e.dprs, 0);
-
+      // Save to state for export consistency
+      State.reportFilters.engineerWise = { engineer, month };
+      
+      let dprData = State.dprs;
+      if (engineer) dprData = dprData.filter(d => d.engineerId === engineer);
+      if (month) dprData = dprData.filter(d => d.date && d.date.startsWith(month));
+      
+      // Calculate summary
+      const totalDPRs = dprData.length;
+      const totalPipes = Utils.cleanNum(dprData.reduce((s, d) => s + (d.pipesUsed || 0), 0));
+      const totalMeters = Utils.cleanNum(dprData.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
+      const totalJoints = Utils.cleanNum(dprData.reduce((s, d) => s + (d.totalJoints || 0), 0));
+      const uniqueEngineers = [...new Set(dprData.map(d => d.engineerId))].length;
+      
       document.getElementById('report-ew-summary').innerHTML = `
         <div class="report-summary-card">
-          <div class="rsc-value">${totalDprs}</div>
+          <div class="rsc-value">${uniqueEngineers}</div>
+          <div class="rsc-label">Engineers</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value">${totalDPRs}</div>
           <div class="rsc-label">Total DPRs</div>
         </div>
         <div class="report-summary-card">
-          <div class="rsc-value">${totalMeters.toFixed(1)}m</div>
-          <div class="rsc-label">Total Meters</div>
-        </div>
-        <div class="report-summary-card">
           <div class="rsc-value">${Utils.formatQty(totalPipes)}</div>
-          <div class="rsc-label">Total Pipes</div>
+          <div class="rsc-label">Pipes Used</div>
         </div>
         <div class="report-summary-card">
-          <div class="rsc-value">${engData.length}</div>
-          <div class="rsc-label">Active Engineers</div>
+          <div class="rsc-value">${totalMeters.toFixed(1)}m</div>
+          <div class="rsc-label">Meters Laid</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value">${Utils.formatQty(totalJoints)}</div>
+          <div class="rsc-label">Joints</div>
         </div>
       `;
 
-      // Table
+      // Engineer-wise table
       const tbody = document.getElementById('report-ew-tbody');
       const cards = document.getElementById('report-ew-cards');
       
-      tbody.innerHTML = engData.map(e => `
+      let engineersToShow = engineer 
+        ? State.engineers.filter(e => e.id === engineer)
+        : State.engineers;
+      
+      if (month) {
+        engineersToShow = engineersToShow.filter(e => 
+          dprData.some(d => d.engineerId === e.id)
+        );
+      }
+
+      if (!engineersToShow.length) {
+        const empty = `
+          <div class="empty-state">
+            <i class="fa-solid fa-users-slash"></i>
+            <h3>No data found</h3>
+            <p>Try adjusting your filters</p>
+          </div>
+        `;
+        tbody.innerHTML = `<tr><td colspan="8">${empty}</td></tr>`;
+        cards.innerHTML = empty;
+        document.getElementById('report-ew-monthly-tbody').innerHTML = '';
+        return;
+      }
+
+      const engStats = engineersToShow.map(e => {
+        const myDprs = dprData.filter(d => d.engineerId === e.id);
+        const meters = Utils.cleanNum(myDprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
+        const avg = myDprs.length > 0 ? meters / myDprs.length : 0;
+        
+        return {
+          ...e,
+          dprs: myDprs.length,
+          pipes: Utils.cleanNum(myDprs.reduce((s, d) => s + (d.pipesUsed || 0), 0)),
+          meters,
+          joints: Utils.cleanNum(myDprs.reduce((s, d) => s + (d.totalJoints || 0), 0)),
+          avg
+        };
+      }).sort((a, b) => b.meters - a.meters);
+
+      tbody.innerHTML = engStats.map(e => `
         <tr>
           <td><strong>${Utils.escapeHtml(e.name)}</strong></td>
           <td class="text-mono">${e.empId || '—'}</td>
-          <td><span class="badge badge-${e.status === 'active' ? 'success' : 'muted'}">${e.status}</span></td>
+          <td><span class="badge ${e.status === 'active' ? 'badge-success' : 'badge-muted'}">${e.status}</span></td>
           <td class="text-mono">${e.dprs}</td>
           <td class="text-mono">${Utils.formatQty(e.pipes)}</td>
           <td class="text-mono">${e.meters.toFixed(1)}m</td>
           <td class="text-mono">${Utils.formatQty(e.joints)}</td>
-          <td class="text-mono">${e.avgMeters.toFixed(1)}m</td>
+          <td class="text-mono">${e.avg.toFixed(1)}m</td>
         </tr>
       `).join('');
 
-      cards.innerHTML = engData.map(e => `
+      cards.innerHTML = engStats.map(e => `
         <div class="data-card">
           <div class="data-card-header">
             <div class="data-card-title">${Utils.escapeHtml(e.name)}</div>
-            <span class="badge badge-${e.status === 'active' ? 'success' : 'muted'}">${e.status}</span>
+            <span class="badge ${e.status === 'active' ? 'badge-success' : 'badge-muted'}">${e.status}</span>
+          </div>
+          <div class="data-card-row">
+            <span class="data-card-label">Emp ID</span>
+            <span class="data-card-value text-mono">${e.empId || '—'}</span>
           </div>
           <div class="data-card-row">
             <span class="data-card-label">DPRs</span>
@@ -4631,60 +4985,154 @@
             <span class="data-card-label">Meters</span>
             <span class="data-card-value text-mono">${e.meters.toFixed(1)}m</span>
           </div>
-          <div class="data-card-row">
-            <span class="data-card-label">Avg/DPR</span>
-            <span class="data-card-value text-mono">${e.avgMeters.toFixed(1)}m</span>
-          </div>
         </div>
       `).join('');
 
       // Monthly breakdown
       const monthlyTbody = document.getElementById('report-ew-monthly-tbody');
-      const monthlyData = [];
+      const months = [...new Set(dprData.map(d => (d.date || '').slice(0, 7)).filter(Boolean))].sort().reverse();
       
-      State.engineers.forEach(e => {
-        const months = [...new Set(State.dprs.filter(d => d.engineerId === e.id).map(d => (d.date || '').slice(0, 7)).filter(Boolean))];
+      const monthlyRows = [];
+      engineersToShow.forEach(e => {
         months.forEach(m => {
-          const dprs = State.dprs.filter(d => d.engineerId === e.id && (d.date || '').startsWith(m));
-          const target = State.targets.find(t => t.engineerId === e.id && t.month === m);
-          const meters = Utils.cleanNum(dprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
-          const pct = target?.targetMeters > 0 ? (meters / target.targetMeters * 100) : 0;
+          const myDprs = dprData.filter(d => d.engineerId === e.id && (d.date || '').startsWith(m));
+          if (myDprs.length === 0) return;
           
-          monthlyData.push({
-            engineer: e.name,
+          const meters = Utils.cleanNum(myDprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
+          const target = State.targets.find(t => t.engineerId === e.id && t.month === m);
+          const targetMeters = target ? Utils.cleanNum(target.targetMeters || 0) : 0;
+          const pct = targetMeters > 0 ? (meters / targetMeters) * 100 : 0;
+          
+          monthlyRows.push({
+            name: e.name,
             month: m,
-            dprs: dprs.length,
-            pipes: Utils.cleanNum(dprs.reduce((s, d) => s + (d.pipesUsed || 0), 0)),
+            dprs: myDprs.length,
+            pipes: Utils.cleanNum(myDprs.reduce((s, d) => s + (d.pipesUsed || 0), 0)),
             meters,
-            targetMeters: target?.targetMeters || 0,
+            targetMeters,
             pct
           });
         });
       });
 
-      monthlyTbody.innerHTML = monthlyData.sort((a, b) => b.month.localeCompare(a.month)).map(d => `
+      monthlyTbody.innerHTML = monthlyRows.map(r => `
         <tr>
-          <td>${Utils.escapeHtml(d.engineer)}</td>
-          <td>${Utils.formatMonth(d.month)}</td>
-          <td class="text-mono">${d.dprs}</td>
-          <td class="text-mono">${Utils.formatQty(d.pipes)}</td>
-          <td class="text-mono">${d.meters.toFixed(1)}m</td>
-          <td class="text-mono">${d.targetMeters.toFixed(1)}m</td>
-          <td class="text-mono" style="color: ${d.pct >= 100 ? 'var(--success-400)' : d.pct >= 50 ? 'var(--warning-400)' : 'var(--danger-400)'}">${d.pct.toFixed(0)}%</td>
+          <td><strong>${Utils.escapeHtml(r.name)}</strong></td>
+          <td>${Utils.formatMonth(r.month)}</td>
+          <td class="text-mono">${r.dprs}</td>
+          <td class="text-mono">${Utils.formatQty(r.pipes)}</td>
+          <td class="text-mono">${r.meters.toFixed(1)}m</td>
+          <td class="text-mono">${r.targetMeters.toFixed(1)}m</td>
+          <td class="text-mono" style="color: ${r.pct >= 100 ? 'var(--success-400)' : r.pct >= 50 ? 'var(--warning-400)' : 'var(--danger-400)'}">${r.pct.toFixed(1)}%</td>
         </tr>
       `).join('');
     },
 
+    exportEngineerWiseCSV() {
+      const { engineer, month } = State.reportFilters.engineerWise;
+      
+      let dprData = State.dprs;
+      if (engineer) dprData = dprData.filter(d => d.engineerId === engineer);
+      if (month) dprData = dprData.filter(d => d.date && d.date.startsWith(month));
+      
+      const rows = [
+        ['Engineer Name', 'Employee ID', 'Status', 'Total DPRs', 'Total Pipes Used', 'Total Meters', 'Total Joints', 'Avg Meters/DPR']
+      ];
+      
+      let engineersToShow = engineer 
+        ? State.engineers.filter(e => e.id === engineer)
+        : State.engineers;
+      
+      engineersToShow.forEach(e => {
+        const myDprs = dprData.filter(d => d.engineerId === e.id);
+        const meters = Utils.cleanNum(myDprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
+        const avg = myDprs.length > 0 ? meters / myDprs.length : 0;
+        
+        rows.push([
+          e.name,
+          e.empId || '',
+          e.status || 'active',
+          myDprs.length,
+          Utils.cleanNum(myDprs.reduce((s, d) => s + (d.pipesUsed || 0), 0)),
+          meters.toFixed(2),
+          Utils.cleanNum(myDprs.reduce((s, d) => s + (d.totalJoints || 0), 0)),
+          avg.toFixed(2)
+        ]);
+      });
+      
+      Utils.downloadCSV(rows, Utils.generateFilename('EngineerWise_Report'));
+      UI.toast('Exported', 'Engineer-wise report downloaded.', 'success');
+    },
+
+    // ============================================
+    // FIXED: loadInventoryReport() - Uses current filter values
+    // ============================================
     loadInventoryReport() {
       const type = document.getElementById('report-inv-type').value;
       const status = document.getElementById('report-inv-status').value;
       
+      // Save to state for export consistency
+      State.reportFilters.inventory = { type, status };
+      
       let data = State.inventory;
       if (type) data = data.filter(p => p.pipeType === type);
       
+      // Calculate summary
+      const totalReceived = Utils.cleanNum(data.reduce((s, p) => s + (p.quantity || 0), 0));
+      const totalAssigned = Utils.cleanNum(data.reduce((s, p) => {
+        return s + State.assignments.filter(a => a.pipeId === p.id).reduce((sum, a) => sum + (a.quantity || 0), 0);
+      }, 0));
+      const totalAvailable = Utils.cleanNum(totalReceived - totalAssigned);
+      const totalUsed = Utils.cleanNum(data.reduce((s, p) => {
+        return s + State.dprs.filter(d => {
+          const asgn = State.assignments.find(a => a.id === d.assignmentId);
+          return asgn && asgn.pipeId === p.id;
+        }).reduce((sum, d) => sum + (d.pipesUsed || 0), 0);
+      }, 0));
+      
+      const lowStock = data.filter(p => {
+        const assigned = State.assignments.filter(a => a.pipeId === p.id).reduce((s, a) => s + (a.quantity || 0), 0);
+        const avail = Utils.cleanNum((p.quantity || 0) - assigned);
+        return p.quantity > 0 && avail / p.quantity < 0.25;
+      }).length;
+      
+      const criticalStock = data.filter(p => {
+        const assigned = State.assignments.filter(a => a.pipeId === p.id).reduce((s, a) => s + (a.quantity || 0), 0);
+        const avail = Utils.cleanNum((p.quantity || 0) - assigned);
+        return p.quantity > 0 && avail / p.quantity < 0.1;
+      }).length;
+      
+      document.getElementById('report-inv-summary').innerHTML = `
+        <div class="report-summary-card">
+          <div class="rsc-value">${data.length}</div>
+          <div class="rsc-label">Pipe Types</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value">${Utils.formatQty(totalReceived)}</div>
+          <div class="rsc-label">Total Received</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value">${Utils.formatQty(totalAssigned)}</div>
+          <div class="rsc-label">Assigned</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value">${Utils.formatQty(totalAvailable)}</div>
+          <div class="rsc-label">Available</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value">${Utils.formatQty(totalUsed)}</div>
+          <div class="rsc-label">Used (DPR)</div>
+        </div>
+        <div class="report-summary-card">
+          <div class="rsc-value" style="color: ${criticalStock > 0 ? 'var(--danger-400)' : lowStock > 0 ? 'var(--warning-400)' : 'var(--success-400)'}">${criticalStock > 0 ? criticalStock : lowStock}</div>
+          <div class="rsc-label">Low Stock</div>
+        </div>
+      `;
+
+      // Apply status filter
       if (status) {
         data = data.filter(p => {
-          const assigned = Utils.cleanNum(State.assignments.filter(a => a.pipeId === p.id).reduce((s, a) => s + (a.quantity || 0), 0));
+          const assigned = State.assignments.filter(a => a.pipeId === p.id).reduce((s, a) => s + (a.quantity || 0), 0);
           const avail = Utils.cleanNum((p.quantity || 0) - assigned);
           const pct = p.quantity > 0 ? avail / p.quantity : 0;
           
@@ -4695,92 +5143,78 @@
         });
       }
 
-      // Summary
-      const totalQty = Utils.cleanNum(data.reduce((s, p) => s + (p.quantity || 0), 0));
-      const totalAssigned = Utils.cleanNum(data.reduce((s, p) => {
-        return s + Utils.cleanNum(State.assignments.filter(a => a.pipeId === p.id).reduce((sum, a) => sum + (a.quantity || 0), 0));
-      }, 0));
-      const totalAvail = Utils.cleanNum(totalQty - totalAssigned);
-      const lowStock = data.filter(p => {
-        const assigned = Utils.cleanNum(State.assignments.filter(a => a.pipeId === p.id).reduce((s, a) => s + (a.quantity || 0), 0));
-        const avail = Utils.cleanNum((p.quantity || 0) - assigned);
-        return p.quantity > 0 && avail / p.quantity < 0.25;
-      }).length;
-
-      document.getElementById('report-inv-summary').innerHTML = `
-        <div class="report-summary-card">
-          <div class="rsc-value">${data.length}</div>
-          <div class="rsc-label">Total Types</div>
-        </div>
-        <div class="report-summary-card">
-          <div class="rsc-value">${Utils.formatQty(totalQty)}</div>
-          <div class="rsc-label">Total Stock</div>
-        </div>
-        <div class="report-summary-card">
-          <div class="rsc-value">${Utils.formatQty(totalAvail)}</div>
-          <div class="rsc-label">Available</div>
-        </div>
-        <div class="report-summary-card">
-          <div class="rsc-value" style="color: ${lowStock > 0 ? 'var(--danger-400)' : 'var(--success-400)'}">${lowStock}</div>
-          <div class="rsc-label">Low Stock</div>
-        </div>
-      `;
-
-      // Table
       const tbody = document.getElementById('report-inv-tbody');
       const cards = document.getElementById('report-inv-cards');
       
+      if (!data.length) {
+        const empty = `
+          <div class="empty-state">
+            <i class="fa-solid fa-box-open"></i>
+            <h3>No inventory found</h3>
+            <p>Try adjusting your filters</p>
+          </div>
+        `;
+        tbody.innerHTML = `<tr><td colspan="10">${empty}</td></tr>`;
+        cards.innerHTML = empty;
+        return;
+      }
+
       tbody.innerHTML = data.map(p => {
-        const assigned = Utils.cleanNum(State.assignments.filter(a => a.pipeId === p.id).reduce((s, a) => s + (a.quantity || 0), 0));
+        const assigned = State.assignments.filter(a => a.pipeId === p.id).reduce((s, a) => s + (a.quantity || 0), 0);
         const avail = Utils.cleanNum((p.quantity || 0) - assigned);
-        const used = Utils.cleanNum(State.dprs.filter(d => {
+        const used = State.dprs.filter(d => {
           const asgn = State.assignments.find(a => a.id === d.assignmentId);
           return asgn && asgn.pipeId === p.id;
-        }).reduce((s, d) => s + (d.pipesUsed || 0), 0));
+        }).reduce((s, d) => s + (d.pipesUsed || 0), 0);
         
         const pct = p.quantity > 0 ? avail / p.quantity : 0;
-        const statusClass = pct < 0.1 ? 'danger' : pct < 0.25 ? 'warning' : 'success';
-        const statusText = pct < 0.1 ? 'Critical' : pct < 0.25 ? 'Low' : 'Normal';
-
+        let statusBadge;
+        if (pct < 0.1) statusBadge = `<span class="badge badge-danger">Critical</span>`;
+        else if (pct < 0.25) statusBadge = `<span class="badge badge-warning">Low</span>`;
+        else statusBadge = `<span class="badge badge-success">Normal</span>`;
+        
         return `
           <tr>
-            <td><strong>${Utils.escapeHtml(p.pipeType)}</strong></td>
-            <td class="text-mono">${p.diameter}mm</td>
-            <td>${Utils.escapeHtml(p.material || '—')}</td>
+            <td><strong>${Utils.escapeHtml(p.pipeType || '—')}</strong></td>
+            <td class="text-mono">${p.diameter || '—'}mm</td>
+            <td>${p.material || '—'}</td>
             <td class="text-mono">${Utils.formatQty(p.quantity)}</td>
             <td class="text-mono">${Utils.formatQty(assigned)}</td>
             <td class="text-mono">${Utils.formatQty(avail)}</td>
             <td class="text-mono">${Utils.formatQty(used)}</td>
-            <td><span class="badge badge-${statusClass}">${statusText}</span></td>
+            <td>${statusBadge}</td>
             <td>${Utils.formatDate(p.dateAdded)}</td>
-            <td>${Utils.escapeHtml(p.notes || '—')}</td>
+            <td>${p.notes || '—'}</td>
           </tr>
         `;
       }).join('');
 
       cards.innerHTML = data.map(p => {
-        const assigned = Utils.cleanNum(State.assignments.filter(a => a.pipeId === p.id).reduce((s, a) => s + (a.quantity || 0), 0));
+        const assigned = State.assignments.filter(a => a.pipeId === p.id).reduce((s, a) => s + (a.quantity || 0), 0);
         const avail = Utils.cleanNum((p.quantity || 0) - assigned);
-        const used = Utils.cleanNum(State.dprs.filter(d => {
+        const used = State.dprs.filter(d => {
           const asgn = State.assignments.find(a => a.id === d.assignmentId);
           return asgn && asgn.pipeId === p.id;
-        }).reduce((s, d) => s + (d.pipesUsed || 0), 0));
+        }).reduce((s, d) => s + (d.pipesUsed || 0), 0);
         
         const pct = p.quantity > 0 ? avail / p.quantity : 0;
-        const statusClass = pct < 0.1 ? 'danger' : pct < 0.25 ? 'warning' : 'success';
+        let statusBadge;
+        if (pct < 0.1) statusBadge = `<span class="badge badge-danger">Critical</span>`;
+        else if (pct < 0.25) statusBadge = `<span class="badge badge-warning">Low</span>`;
+        else statusBadge = `<span class="badge badge-success">Normal</span>`;
 
         return `
           <div class="data-card">
             <div class="data-card-header">
-              <div class="data-card-title">${Utils.escapeHtml(p.pipeType)} Ø${p.diameter}mm</div>
-              <span class="badge badge-${statusClass}">${pct < 0.1 ? 'Critical' : pct < 0.25 ? 'Low' : 'Normal'}</span>
+              <div class="data-card-title">${Utils.escapeHtml(p.pipeType || '—')} Ø${p.diameter || '—'}mm</div>
+              ${statusBadge}
             </div>
             <div class="data-card-row">
               <span class="data-card-label">Material</span>
-              <span class="data-card-value">${Utils.escapeHtml(p.material || '—')}</span>
+              <span class="data-card-value">${p.material || '—'}</span>
             </div>
             <div class="data-card-row">
-              <span class="data-card-label">Total</span>
+              <span class="data-card-label">Received</span>
               <span class="data-card-value text-mono">${Utils.formatQty(p.quantity)}</span>
             </div>
             <div class="data-card-row">
@@ -4791,112 +5225,23 @@
               <span class="data-card-label">Available</span>
               <span class="data-card-value text-mono">${Utils.formatQty(avail)}</span>
             </div>
+            <div class="data-card-row">
+              <span class="data-card-label">Used (DPR)</span>
+              <span class="data-card-value text-mono">${Utils.formatQty(used)}</span>
+            </div>
           </div>
         `;
       }).join('');
     },
 
-    // ============================================
-    // PROFESSIONAL EXPORT FUNCTIONS
-    // ============================================
-    exportMonthWiseCSV() {
-      const month = document.getElementById('report-mw-month').value;
-      const eng = document.getElementById('report-mw-engineer').value;
-      const pipe = document.getElementById('report-mw-pipe').value;
-      
-      let data = State.dprs;
-      if (month) data = data.filter(d => (d.date || '').startsWith(month));
-      if (eng) data = data.filter(d => d.engineerId === eng);
-      if (pipe) data = data.filter(d => d.pipeType === pipe);
-
-      const rows = [
-        ['Month-wise DPR Report - Sai Eternal Foundation'],
-        ['Generated:', new Date().toLocaleString('en-IN')],
-        ['Filters:', month ? `Month: ${Utils.formatMonth(month)}` : 'All Months', eng ? `Engineer: ${DataService.getEngineerName(eng)}` : 'All Engineers', pipe ? `Pipe: ${pipe}` : 'All Pipes'],
-        [],
-        ['Date', 'Engineer Name', 'Pipe Type', 'Diameter (mm)', 'Material', 'Pipes Used', 'Meters Laid', 'Total Joints', 'Start Junction', 'End Junction', 'Notes']
-      ];
-
-      data.forEach(d => {
-        const asgn = State.assignments.find(a => a.id === d.assignmentId);
-        const pipeData = asgn ? State.inventory.find(p => p.id === asgn.pipeId) : null;
-        
-        rows.push([
-          d.date,
-          DataService.getEngineerName(d.engineerId),
-          d.pipeType || '',
-          d.diameter || '',
-          pipeData?.material || '',
-          d.pipesUsed,
-          Utils.cleanNum(d.meterLaid || 0).toFixed(2),
-          d.totalJoints || 0,
-          d.startJunction || '',
-          d.endJunction || '',
-          d.notes || ''
-        ]);
-      });
-
-      // Add summary
-      const totalMeters = Utils.cleanNum(data.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0));
-      const totalPipes = Utils.cleanNum(data.reduce((s, d) => s + (d.pipesUsed || 0), 0));
-      rows.push([], ['Summary'], ['Total DPRs:', data.length], ['Total Meters:', totalMeters.toFixed(2)], ['Total Pipes:', totalPipes]);
-
-      Utils.downloadCSV(rows, Utils.generateFilename('Monthwise_DPR_Report'));
-      UI.toast('Exported', 'Month-wise DPR report downloaded.', 'success');
-    },
-
-    exportEngineerWiseCSV() {
-      const eng = document.getElementById('report-ew-engineer').value;
-      const month = document.getElementById('report-ew-month').value;
-      
-      let dprs = State.dprs;
-      if (eng) dprs = dprs.filter(d => d.engineerId === eng);
-      if (month) dprs = dprs.filter(d => (d.date || '').startsWith(month));
-
-      const engData = State.engineers.map(e => {
-        const eDprs = dprs.filter(d => d.engineerId === e.id);
-        return {
-          ...e,
-          dprs: eDprs.length,
-          pipes: Utils.cleanNum(eDprs.reduce((s, d) => s + (d.pipesUsed || 0), 0)),
-          meters: Utils.cleanNum(eDprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0)),
-          joints: Utils.cleanNum(eDprs.reduce((s, d) => s + (d.totalJoints || 0), 0)),
-          avgMeters: eDprs.length > 0 ? Utils.cleanNum(eDprs.reduce((s, d) => s + (parseFloat(d.meterLaid) || 0), 0)) / eDprs.length : 0
-        };
-      }).filter(e => e.dprs > 0).sort((a, b) => b.meters - a.meters);
-
-      const rows = [
-        ['Engineer-wise Performance Report - Sai Eternal Foundation'],
-        ['Generated:', new Date().toLocaleString('en-IN')],
-        ['Filters:', eng ? `Engineer: ${DataService.getEngineerName(eng)}` : 'All Engineers', month ? `Month: ${Utils.formatMonth(month)}` : 'All Months'],
-        [],
-        ['Engineer Name', 'Employee ID', 'Status', 'Total DPRs', 'Total Pipes Used', 'Total Meters Laid', 'Total Joints', 'Avg Meters/DPR']
-      ];
-
-      engData.forEach(e => {
-        rows.push([e.name, e.empId || '', e.status, e.dprs, e.pipes, e.meters.toFixed(2), e.joints, e.avgMeters.toFixed(2)]);
-      });
-
-      // Add summary
-      const totalMeters = Utils.cleanNum(engData.reduce((s, e) => s + e.meters, 0));
-      const totalPipes = Utils.cleanNum(engData.reduce((s, e) => s + e.pipes, 0));
-      const totalDprs = engData.reduce((s, e) => s + e.dprs, 0);
-      rows.push([], ['Summary'], ['Total Engineers:', engData.length], ['Total DPRs:', totalDprs], ['Total Meters:', totalMeters.toFixed(2)], ['Total Pipes:', totalPipes]);
-
-      Utils.downloadCSV(rows, Utils.generateFilename('Engineerwise_Performance_Report'));
-      UI.toast('Exported', 'Engineer-wise performance report downloaded.', 'success');
-    },
-
     exportInventoryCSV() {
-      const type = document.getElementById('report-inv-type').value;
-      const status = document.getElementById('report-inv-status').value;
+      const { type, status } = State.reportFilters.inventory;
       
       let data = State.inventory;
       if (type) data = data.filter(p => p.pipeType === type);
-      
       if (status) {
         data = data.filter(p => {
-          const assigned = Utils.cleanNum(State.assignments.filter(a => a.pipeId === p.id).reduce((s, a) => s + (a.quantity || 0), 0));
+          const assigned = State.assignments.filter(a => a.pipeId === p.id).reduce((s, a) => s + (a.quantity || 0), 0);
           const avail = Utils.cleanNum((p.quantity || 0) - assigned);
           const pct = p.quantity > 0 ? avail / p.quantity : 0;
           
@@ -4906,39 +5251,104 @@
           return true;
         });
       }
-
+      
       const rows = [
-        ['Stock Report - Sai Eternal Foundation'],
-        ['Generated:', new Date().toLocaleString('en-IN')],
-        ['Filters:', type ? `Pipe Type: ${type}` : 'All Types', status ? `Status: ${status}` : 'All Status'],
-        [],
-        ['Pipe Type', 'Diameter (mm)', 'Material', 'Total Received', 'Assigned', 'Available', 'Used (DPR)', 'Status', 'Date Added', 'Notes']
+        ['Pipe Type', 'Diameter (mm)', 'Material', 'Total Received', 'Total Assigned', 'Current Available', 'Used (DPR)', 'Status', 'Date Added', 'Notes']
       ];
-
+      
       data.forEach(p => {
-        const assigned = Utils.cleanNum(State.assignments.filter(a => a.pipeId === p.id).reduce((s, a) => s + (a.quantity || 0), 0));
+        const assigned = State.assignments.filter(a => a.pipeId === p.id).reduce((s, a) => s + (a.quantity || 0), 0);
         const avail = Utils.cleanNum((p.quantity || 0) - assigned);
-        const used = Utils.cleanNum(State.dprs.filter(d => {
+        const used = State.dprs.filter(d => {
           const asgn = State.assignments.find(a => a.id === d.assignmentId);
           return asgn && asgn.pipeId === p.id;
-        }).reduce((s, d) => s + (d.pipesUsed || 0), 0));
+        }).reduce((s, d) => s + (d.pipesUsed || 0), 0);
         
         const pct = p.quantity > 0 ? avail / p.quantity : 0;
-        const statusText = pct < 0.1 ? 'Critical' : pct < 0.25 ? 'Low' : 'Normal';
-
-        rows.push([p.pipeType, p.diameter, p.material || '', p.quantity, assigned, avail, used, statusText, p.dateAdded || '', p.notes || '']);
+        let statusText;
+        if (pct < 0.1) statusText = 'Critical';
+        else if (pct < 0.25) statusText = 'Low';
+        else statusText = 'Normal';
+        
+        rows.push([
+          p.pipeType,
+          p.diameter,
+          p.material || '',
+          p.quantity,
+          assigned,
+          avail,
+          used,
+          statusText,
+          p.dateAdded || '',
+          p.notes || ''
+        ]);
       });
+      
+      Utils.downloadCSV(rows, Utils.generateFilename('Inventory_Stock_Report'));
+      UI.toast('Exported', 'Inventory stock report downloaded.', 'success');
+    }
+  };
 
-      // Add summary
-      const totalQty = Utils.cleanNum(data.reduce((s, p) => s + (p.quantity || 0), 0));
-      const totalAssigned = Utils.cleanNum(data.reduce((s, p) => {
-        return s + Utils.cleanNum(State.assignments.filter(a => a.pipeId === p.id).reduce((sum, a) => sum + (a.quantity || 0), 0));
-      }, 0));
-      const totalAvail = Utils.cleanNum(totalQty - totalAssigned);
-      rows.push([], ['Summary'], ['Total Types:', data.length], ['Total Stock:', totalQty], ['Total Assigned:', totalAssigned], ['Total Available:', totalAvail]);
+  // ============================================
+  // NOTIFICATIONS MODULE
+  // ============================================
+  const Notifications = {
+    async load() {
+      try {
+        const snap = await getDocs(query(collection(db, 'notifications'), orderBy('createdAt', 'desc'), limit(50)));
+        State.notifications = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        this.render();
+        this.updateBadge();
+      } catch (e) {
+        console.error('Error loading notifications:', e);
+      }
+    },
 
-      Utils.downloadCSV(rows, Utils.generateFilename('Stock_Report'));
-      UI.toast('Exported', 'Stock report downloaded.', 'success');
+    render() {
+      const list = document.getElementById('notif-list');
+      const unread = State.notifications.filter(n => !n.read);
+      
+      if (!State.notifications.length) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-bell-slash"></i>
+            <h3>No notifications</h3>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = State.notifications.map(n => `
+        <div class="notif-item ${n.read ? '' : 'unread'} ${n.type || ''}" onclick="App.Notifications.markRead('${n.id}')">
+          <div class="notif-title">${Utils.escapeHtml(n.title || 'Notification')}</div>
+          <div class="notif-msg">${Utils.escapeHtml(n.message || '')}</div>
+          <div class="notif-time">${Utils.formatDate(n.createdAt)}</div>
+        </div>
+      `).join('');
+    },
+
+    updateBadge() {
+      const unread = State.notifications.filter(n => !n.read).length;
+      const badge = document.getElementById('notif-badge');
+      
+      if (unread > 0) {
+        badge.textContent = unread > 99 ? '99+' : unread;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    },
+
+    async markRead(id) {
+      try {
+        await updateDoc(doc(db, 'notifications', id), { read: true });
+        const n = State.notifications.find(x => x.id === id);
+        if (n) n.read = true;
+        this.render();
+        this.updateBadge();
+      } catch (e) {
+        console.error('Error marking notification read:', e);
+      }
     }
   };
 
@@ -4948,6 +5358,7 @@
   const App = {
     Auth,
     UI,
+    DataService,
     Dashboard,
     Inventory,
     Engineers,
@@ -4955,121 +5366,116 @@
     DPR,
     Targets,
     Reports,
+    Notifications,
 
     async init() {
       UI.init();
-
+      
       onAuthStateChanged(auth, async (user) => {
         if (user) {
-          State.currentUser = user;
-          
           try {
             const userDoc = await getDoc(doc(db, 'users', user.uid));
-            let role = 'viewer';
+            const userData = userDoc.data() || {};
             
-            if (userDoc.exists()) {
-              role = userDoc.data().role || 'viewer';
-            } else {
-              for (const [key, val] of Object.entries(USERNAME_MAP)) {
-                if (val.email === user.email) {
-                  role = val.role;
-                  break;
-                }
-              }
-            }
-            
-            State.currentRole = role;
+            State.currentUser = user;
+            State.currentRole = userData.role || 'viewer';
+
             await DataService.loadInitialData();
-            
-            if (role === 'engineer') {
+            UI.hideLoading();
+
+            if (State.currentRole === 'engineer') {
               const savedEngId = sessionStorage.getItem('selectedEngineerId');
               if (savedEngId) {
-                const eng = State.engineers.find(e => e.id === savedEngId);
-                if (eng) {
-                  State.currentEngineer = eng;
+                State.currentEngineer = State.engineers.find(e => e.id === savedEngId) || null;
+                if (State.currentEngineer) {
                   Auth.showApp();
                 } else {
                   Auth.showEngSelect();
                 }
               } else {
-                const myEng = State.engineers.find(e => e.userId === user.uid);
-                if (myEng) {
-                  State.currentEngineer = myEng;
-                  sessionStorage.setItem('selectedEngineerId', myEng.id);
-                  Auth.showApp();
-                } else {
-                  Auth.showEngSelect();
-                }
+                Auth.showEngSelect();
               }
             } else {
               Auth.showApp();
             }
+
+            Notifications.load();
           } catch (e) {
-            console.error('Auth error:', e);
-            UI.toast('Error', 'Authentication failed.', 'error');
-            Auth.showLogin();
+            console.error('Auth state error:', e);
+            UI.toast('Error', 'Failed to load user data.', 'error');
+            Auth.logout();
           }
         } else {
+          UI.hideLoading();
           Auth.showLogin();
         }
-        
-        UI.hideLoading();
       });
     },
 
-    navigateTo(page) {
+    async navigateTo(page) {
       State.currentPage = page;
-      
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById(`page-${page}`)?.classList.add('active');
-      
-      UI.setActiveNav(page);
       UI.closeSidebar();
-      
-      switch (page) {
-        case 'dashboard': Dashboard.load(); break;
-        case 'inventory': Inventory.load(); break;
-        case 'engineers': Engineers.load(); break;
-        case 'assignments': Assignments.load(); break;
-        case 'dpr': DPR.load(); break;
-        case 'targets': Targets.load(); break;
-        case 'reports': Reports.load(); break;
+      UI.closeNotifPanel();
+      UI.setActiveNav(page);
+
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(`page-${page}`).classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (State.isLoading) return;
+      State.isLoading = true;
+
+      try {
+        switch (page) {
+          case 'dashboard':
+            Dashboard.load();
+            break;
+          case 'inventory':
+            Inventory.load();
+            break;
+          case 'engineers':
+            Engineers.load();
+            break;
+          case 'assignments':
+            Assignments.load();
+            break;
+          case 'dpr':
+            DPR.load();
+            break;
+          case 'targets':
+            Targets.load();
+            break;
+          case 'reports':
+            Reports.load();
+            break;
+        }
+      } catch (e) {
+        console.error('Navigation error:', e);
+        UI.toast('Error', 'Failed to load page data.', 'error');
+      } finally {
+        State.isLoading = false;
       }
     },
 
     async refreshData() {
-      const btn = document.querySelector('#dashboard-actions .btn-primary');
-      if (btn) UI.setButtonLoading(btn, true);
-      
+      UI.toast('Refreshing', 'Loading latest data...', 'info');
       try {
         await DataService.loadAllData();
-        UI.toast('Refreshed', 'Data updated successfully.', 'success');
-        
-        switch (State.currentPage) {
-          case 'dashboard': Dashboard.load(); break;
-          case 'inventory': Inventory.load(); break;
-          case 'engineers': Engineers.load(); break;
-          case 'assignments': Assignments.load(); break;
-          case 'dpr': DPR.load(); break;
-          case 'targets': Targets.load(); break;
-          case 'reports': Reports.load(); break;
-        }
+        UI.toast('Success', 'Data refreshed.', 'success');
+        this.navigateTo(State.currentPage);
       } catch (e) {
         UI.toast('Error', e.message, 'error');
-      } finally {
-        if (btn) UI.setButtonLoading(btn, false);
       }
     }
   };
 
-  // Make App globally accessible
-  window.App = App;
-  window.State = State;
-  window.Utils = Utils;
-  window.DataService = DataService;
-
-  // Initialize
+  // Initialize app
   App.init();
+
+  // Expose to global scope for onclick handlers
+  window.App = App;
+  window.Utils = Utils;
   </script>
 </body>
 </html>
